@@ -1,9 +1,11 @@
 #include <hotdraw.h>
-
-#include <stdio.h>
-extern int snprintf(char* str, size_t size, const char* format, ...);
+#include <core.h>
 
 #include <string.h>
+#include <assert.h>
+#include <stdlib.h>
+#include <stdio.h>
+extern int snprintf(char* str, size_t size, const char* format, ...);
 
 #include <raylib.h>
 
@@ -63,9 +65,12 @@ void ntos(char* string, const n64 len, n64 number) {
 void init_fn(HGL_State* state) {
 	printf("Loaded module!\n");
 	state->tick = 0;
+	string_new(&state->buffer, 64);
 }
 
 void tick_fn(HGL_State* state) {
+	String* buffer = &state->buffer;
+	Vector2 mouse = GetMousePosition();
 	const n32 WINDOW_WIDTH = GetScreenWidth();
 	const n32 WINDOW_HEIGHT = GetScreenHeight();
 
@@ -101,9 +106,8 @@ void tick_fn(HGL_State* state) {
 	{
 		n64 i;
 		n64 selected_id = 0;
-		char buffer[64] = {0};
 
-		for(i = 0; i < 5; ++i) {
+		for(i = 0; i < state->events.count; ++i) {
 			Color color = CLR_FOREG;
 			MEvent event = state->events.items[i];
 
@@ -120,17 +124,85 @@ void tick_fn(HGL_State* state) {
 				DrawRectangleLinesEx(rect, HBORD, color);
 			}
 
-			string_append(&event.file_line, '\0');
-			DrawText(event.file_line.chars, rect.x + HPAD, rect.y + HPAD, FONT_SIZE, color);
+			string_clear(buffer);
 
-			snprintf(buffer, 64, "%s %luB", EVENT_TYPE_LABEL[event.type], 64L);
-			DrawText(buffer, rect.x + HPAD, rect.y + FONT_SIZE + HPAD, FONT_SIZE, color);
+			switch(event.type) {
+				case MALLOC:
+					/* #1 MALLOC 64B */
+					buffer->count = 1 + snprintf(buffer->chars, buffer->capacity, "#%lu %s %dB", i,
+							EVENT_TYPE_LABEL[event.type], event.as.malloc.size);
+					break;
+					/* 0xABCDEF01 */
 
-			/* MALLOC 64B */ /* REALLOC 0xABC 64B */ /* CALLOC 1 64b */ /* FREE 0xABC */
-			/* 0xABCDEF01 */ /* 0xABCDEF012345678 */ /* 0xABCDEF0123 */
+				case REALLOC:
+					/* #1 REALLOC 0xABC 64B */
+					buffer->count = 1 + snprintf(buffer->chars, buffer->capacity, "#%lu %s 0x%x %dB",
+							i, EVENT_TYPE_LABEL[event.type], event.as.realloc.fptr,
+							event.as.realloc.new_size);
+					break;
+					/* 0xABCDEF012345678 */
+
+				case CALLOC:
+					/* #1 CALLOC 1 64b */
+					buffer->count = 1 + snprintf(buffer->chars, buffer->capacity, "#%lu %s %d %dB",
+							i, EVENT_TYPE_LABEL[event.type], event.as.calloc.memb,
+							event.as.calloc.size);
+					break;
+					/* 0xABCDEF0123 */
+
+				case FREE:
+					/* #1 FREE 0xABC */
+					buffer->count = 1 + snprintf(buffer->chars, buffer->capacity, "#%lu %s 0x%x",
+							i, EVENT_TYPE_LABEL[event.type], event.as.free.ptr);
+					break;
+
+				default: assert(0);
+			}
+
+			DrawText(buffer->chars, rect.x + HPAD, rect.y + HPAD, FONT_SIZE, RED);
+
+ 			/* hovering */
+			if(mouse.x > rect.x && mouse.x < rect.x + rect.width &&
+				mouse.y > rect.y && mouse.y < rect.y + rect.height) {
+				DrawText(event.file_line.chars, rect.x + HPAD, rect.y + FONT_SIZE + HPAD, FONT_SIZE, color);
+			} else {
+				string_clear(buffer);
+
+				switch(event.type) {
+					case MALLOC:
+						/* 0xABCDEF01 */
+						buffer->count = 1 + snprintf(buffer->chars,
+								buffer->capacity, "0x%x", event.as.malloc.rptr);
+						break;
+
+					case REALLOC:
+						/* 0xABCDEF012345678 */
+						buffer->count = 1 + snprintf(buffer->chars,
+								buffer->capacity, "0x%x", event.as.realloc.rptr);
+						break;
+
+					case CALLOC:
+						/* 0xABCDEF0123 */
+						buffer->count = 1 + snprintf(buffer->chars,
+								buffer->capacity, "0x%x",
+								event.as.calloc.rptr);
+						break;
+
+					case FREE:
+						/* #1 FREE 0xABC */
+						buffer->count = 1 + snprintf(buffer->chars, buffer->capacity, "#%lu %s 0x%x",
+								i, EVENT_TYPE_LABEL[event.type], event.as.free.ptr);
+						break;
+
+					default: assert(0);
+				}
+
+				DrawText(buffer->chars, rect.x + HPAD, rect.y + FONT_SIZE + HPAD, FONT_SIZE, color);
+
+			}
+
 		}
 	}
-
 
 	{
 		Rectangle rect = {0};
@@ -148,6 +220,8 @@ void tick_fn(HGL_State* state) {
 		rect.width = EVENT_SIDEBAR_WIDTH;
 		rect.height = WINDOW_HEIGHT;
 		DrawRectangleLinesEx(rect, BORD, CLR_FOREG);
+
+		DrawCircleV(mouse, 5, RED);
 	}
 
 	EndDrawing();

@@ -1,7 +1,7 @@
 #ifndef HGL_HOTDRAW_
 #define HGL_HOTDRAW_
 
-#include "core.h"
+#include <core.h>
 
 typedef enum MEvent_Type { MALLOC = 0, CALLOC, REALLOC, FREE } MEvent_Type;
 typedef struct MEvent {
@@ -11,27 +11,27 @@ typedef struct MEvent {
 	union {
 		struct {
 			/* "%s:%d\tMALLOC %luB\t%p\n" */
-			n64 size;
-			n64 rptr;
+			n32 size;
+			n32 rptr;
 		} malloc;
 
 		struct {
 			/* "%s:%d\tCALLOC %lu %luB\t%p\n" */
-			n64 memb;
-			n64 size;
-			n64 rptr;
+			n32 memb;
+			n32 size;
+			n32 rptr;
 		} calloc;
 
 		struct {
 			/* "%s:%d\tREALLOC %p %luB\t%p\n" */
-			n64 fptr;
-			n64 new_size;
-			n64 rptr;
+			n32 fptr;
+			n32 new_size;
+			n32 rptr;
 		} realloc;
 
 		struct {
 			/* "%s:%d\tFREE %p\n" */
-			n64 ptr;
+			n32 ptr;
 		} free;
 	} as;
 } MEvent;
@@ -43,6 +43,7 @@ typedef struct MEvents {
 
 typedef struct {
 	MEvents events;
+	String buffer;
 	n64 tick;
 } HGL_State;
 

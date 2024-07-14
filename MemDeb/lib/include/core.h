@@ -48,23 +48,31 @@ typedef struct String {
 #define STR_FMT "%.*s"
 #define STR(STRING) (int)(STRING).count, (STRING).chars
 
-extern void string_new(String* string, n64 capacity);
-extern void string_new_from(String* string, char* text, n64 text_len);
+#define string_new(STRING, CAPACITY) string_new_(STRING, CAPACITY, __FILE__, __LINE__)
+#define string_new_from(STRING, TEXT, TEXT_LEN) string_new_from_(STRING, TEXT, TEXT_LEN, __FILE__, __LINE__)
+#define string_from(STRING, TEXT, TEXT_LEN) string_from_(STRING, TEXT, TEXT_LEN, __FILE__, __LINE__)
+#define string_cpy(STRING, TEXT, TEXT_LEN) string_cpy_(STRING, TEXT, TEXT_LEN, __FILE__, __LINE__)
+#define string_nterm(STRING) string_nterm_(STRING, __FILE__, __LINE__)
+#define string_append(STRING, CHR) string_append_(STRING, CHR, __FILE__, __LINE__)
+#define string_free(string) string_free_(STRING, __FILE__, __LINE__)
+
+extern void string_new_(String* string, n64 capacity, char* file, int line);
+extern void string_new_from_(String* string, char* text, n64 text_len, char* file, int line);
+extern void string_from_(String* string, char* text, n64 text_len, char* file, int line);
+extern void string_nterm_(String* string, char* file, int line); /* Null terminate a string */
+extern void string_append_(String* string, char chr, char* file, int line);
+extern void string_free_(String* string, char* file, int line);
+
 extern void string_clear(String* string);
-extern void string_from(String* string, char* text, n64 text_len);
-extern void string_cpy(String* string, char* text, n64 text_len);
-extern void string_append(String* string, char chr);
 extern void string_remove(String* string, n64 count);
 extern bool string_equals(String strA, char* strB, n64 strB_len);
-extern void string_free(String* string);
-
 
 /* Memory debug */
 #if DEBUG_MEMDEB_ENABLE
-#	define dmalloc(SIZE) malloc_deb_(SIZE, __FILE__, __LINE__)
-#	define dfree(PTR)    free_deb_(PTR, __FILE__, __LINE__)
-#	define dcalloc(NMEMB, SIZE) calloc_deb_(NMEMB, SIZE, __FILE__, __LINE__)
-#	define drealloc(PTR, SIZE)  realloc_deb_(PTR, SIZE, __FILE__, __LINE__)
+#	define dmalloc(SIZE) malloc_(SIZE, __FILE__, __LINE__)
+#	define dfree(PTR)    free_(PTR, __FILE__, __LINE__)
+#	define dcalloc(NMEMB, SIZE) calloc_(NMEMB, SIZE, __FILE__, __LINE__)
+#	define drealloc(PTR, SIZE)  realloc_(PTR, SIZE, __FILE__, __LINE__)
 #else
 #	define dmalloc(SIZE) malloc(SIZE)
 #	define dfree(PTR)    free(PTR)
@@ -72,10 +80,10 @@ extern void string_free(String* string);
 #	define drealloc(PTR, SIZE)  realloc(PTR, SIZE)
 #endif
 
-extern void *malloc_deb_(size_t size, char* file, int line);
-extern void free_deb_(void* ptr, char* file, int line);
-extern void *calloc_deb_(size_t nmemb, size_t size, char* file, int line);
-extern void *realloc_deb_(void* ptr, size_t size, char* file, int line);
+extern void *malloc_(size_t size, char* file, int line);
+extern void free_(void* ptr, char* file, int line);
+extern void *calloc_(size_t nmemb, size_t size, char* file, int line);
+extern void *realloc_(void* ptr, size_t size, char* file, int line);
 
 
 /* Macros */

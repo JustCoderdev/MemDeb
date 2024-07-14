@@ -11,11 +11,11 @@
 
 /* #define DEBUG_STRING_ENABLE 1 */
 
-void string_new(String* string, n64 capacity) {
-	string->chars = dmalloc(capacity * sizeof(char));
+void string_new_(String* string, n64 capacity, char* file, int line) {
+	string->chars = malloc_(capacity * sizeof(char), file, line);
 	if(string->chars == NULL) {
 		printf("ERROR:%s:%d: Couldn't mallocate string, error: %s",
-				__FILE__, __LINE__, strerror(errno));
+				file, line, strerror(errno));
 		exit(failure);
 	}
 
@@ -28,11 +28,11 @@ void string_new(String* string, n64 capacity) {
 	string->count = 0;
 }
 
-void string_new_from(String* string, char* text, n64 text_len) {
-	string->chars = dmalloc(text_len * sizeof(char));
+void string_new_from_(String* string, char* text, n64 text_len, char* file, int line) {
+	string->chars = malloc_(text_len * sizeof(char), file, line);
 	if(string->chars == NULL) {
 		printf("ERROR:%s:%d: Couldn't mallocate string, error: %s",
-				__FILE__, __LINE__, strerror(errno));
+				file, line, strerror(errno));
 		exit(failure);
 	}
 
@@ -46,16 +46,12 @@ void string_new_from(String* string, char* text, n64 text_len) {
 	string->count = text_len;
 }
 
-void string_clear(String* string) {
-	string->count = 0;
-}
-
-void string_from(String* string, char* text, n64 text_len) {
+void string_from_(String* string, char* text, n64 text_len, char* file, int line) {
 	if(string->capacity < text_len) {
-		string->chars = drealloc(string->chars, text_len * sizeof(char));
+		string->chars = realloc_(string->chars, text_len * sizeof(char), file, line);
 		if(string->chars == NULL) {
 			printf("ERROR:%s:%d: Couldn't reallocate string, error: %s",
-					__FILE__, __LINE__, strerror(errno));
+					file, line, strerror(errno));
 			exit(failure);
 		}
 		string->capacity = text_len;
@@ -65,12 +61,17 @@ void string_from(String* string, char* text, n64 text_len) {
 	string->count = text_len;
 }
 
-void string_append(String* string, char chr) {
+void string_nterm_(String* string, char* file, int line) {
+	if(string->count == 0 || string->chars[string->count - 1] != '\0')
+		string_append_(string, '\0', file, line);
+}
+
+void string_append_(String* string, char chr, char* file, int line) {
 	if(string->capacity < string->count + 1) {
-		string->chars = drealloc(string->chars, (string->count + 1) * 2 * sizeof(char));
+		string->chars = realloc_(string->chars, (string->count + 1) * 2 * sizeof(char), file, line);
 		if(string->chars == NULL) {
 			printf("ERROR:%s:%d: Couldn't resize string, error: %s",
-					__FILE__, __LINE__, strerror(errno));
+					file, line, strerror(errno));
 			exit(failure);
 		}
 		string->capacity = (string->count + 1) * 2;
@@ -80,9 +81,28 @@ void string_append(String* string, char chr) {
 	string->count++;
 }
 
+void string_free_(String* string, char* file, int line) {
+	if(string->chars != NULL) {
+
+#if DEBUG_STRING_ENABLE
+		printf("DEBUG: Freeing string at %p ('"STR_FMT"')\n", string->chars, STR(*string));
+#endif
+
+		free_(string->chars, file, line);
+	}
+
+	string->count = 0;
+	string->capacity = 0;
+}
+
+/* Normal aaaaaa */
+void string_clear(String* string) {
+	string->count = 0;
+}
+
 void string_remove(String* string, n64 count) {
 	string->count -= (count > string->count)
-		? string->count
+	? string->count
 		: count;
 }
 
@@ -96,18 +116,4 @@ bool string_equals(String strA, char* strB, n64 strB_len) {
 			return false;
 
 	return true;
-}
-
-void string_free(String* string) {
-	if(string->chars != NULL) {
-
-#if DEBUG_STRING_ENABLE
-		printf("DEBUG: Freeing string at %p ('"STR_FMT"')\n", string->chars, STR(*string));
-#endif
-
-		dfree(string->chars);
-	}
-
-	string->count = 0;
-	string->capacity = 0;
 }
