@@ -20,7 +20,9 @@ RAYFLAGS = -lGL -lm -lpthread -ldl -lX11 \
 		-Wl,-rpath=./lib/raylib/ -L./lib/raylib -lraylib
 #-lXrandr -lXinerama -lXi -lXcursor
 
-DFLAGS = -DEMULATION_ENABLE=1 -DDEBUG_ENABLE=1 -DDEBUG_MEMDEB_ENABLE=1
+#-DDEBUG_MEMDEB_ENABLE=1
+#-DDEBUG_STRING_ENABLE=1
+DFLAGS = -DDEBUG_ENABLE=1
 FLAGS = $(CCFLAGS) $(IFLAGS) $(LDFLAGS) $(RAYFLAGS) $(DFLAGS)
 
 local: build_so build run

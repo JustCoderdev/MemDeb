@@ -5,6 +5,7 @@
 #define CORE_H_
 
 /* #define DEBUG_ENABLE 1 */
+/* #define DEBUG_STRING_ENABLE 1 */
 /* #define DEBUG_MEMDEB_ENABLE 1 */
 
 #include <stdio.h>
@@ -93,6 +94,10 @@ extern void *realloc_(void* ptr, size_t size, char* file, int line);
 
 #ifndef max
 #define max(A, B) ((A) > (B) ? (A) : (B))
+#endif
+
+#ifndef clamp
+#define clamp(MIN, VAL, MAX) ((VAL) <= (MIN) ? (MIN) : ((VAL) >= (MAX) ? (MAX) : (VAL)))
 #endif
 
 

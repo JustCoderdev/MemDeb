@@ -45,6 +45,8 @@ typedef struct {
 	MEvents events;
 	String buffer;
 	n64 tick;
+	i64 cevent_index;
+	i64 offset;
 } HGL_State;
 
 extern error HGL_load(char* path);
