@@ -88,7 +88,7 @@ extern void *realloc_(void* ptr, size_t size, char* file, int line);
 
 
 /* Macros */
-#ifndef min
+#ifndef min /* clamp(0, x, y) = min(x, y) if x is unsigned */
 #define min(A, B) ((A) > (B) ? (B) : (A))
 #endif
 
@@ -98,6 +98,18 @@ extern void *realloc_(void* ptr, size_t size, char* file, int line);
 
 #ifndef clamp
 #define clamp(MIN, VAL, MAX) ((VAL) <= (MIN) ? (MIN) : ((VAL) >= (MAX) ? (MAX) : (VAL)))
+#endif
+
+#ifndef oclamp /* overflow clamp */
+#define oclamp(MIN, VAL, MAX) ((VAL) < (MIN) ? (MAX) : ((VAL) > (MAX) ? (MIN) : (VAL)))
+#endif
+
+#ifndef range_out
+#define range_out(LB, VAL, HB) ((VAL) < (LB) || (VAL) > (HB))
+#endif
+
+#ifndef range_in
+#define range_in(LB, VAL, HB) ((VAL) > (LB) && (VAL) < (HB))
 #endif
 
 

@@ -20,6 +20,9 @@ extern int snprintf(char* str, size_t size, const char* format, ...);
 #define BORD 4
 #define DBORD 8
 
+#define BAR_WIDTH (DPAD)
+#define EVENT_SIDEBAR_WIDTH (300 + BAR_WIDTH + DPAD)
+
 const char* EVENT_TYPE_LABEL[4] = { "MALLOC", "CALLOC", "REALLOC", "FREE" };
 
 Color htoc_(n32 hex) { /* 0x RR GG BB AA */
@@ -75,21 +78,33 @@ void init_fn(HGL_State* state) {
 	state->offset = 0;
 }
 
+void draw_bar(Rectangle bbox, n64 progress, n64 total, n64 visible, Color color) {
+	Rectangle cursor = {0};
+	float seg = bbox.height / total;
+
+	cursor.width = bbox.width;
+	cursor.height = seg * visible; /*  + ((n64)bbox.height % total) */
+	cursor.x = bbox.x;
+	cursor.y = bbox.y + (seg * progress);
+
+	DrawRectangleLinesEx(bbox, BORD, color);
+	DrawRectangleRec(cursor, color);
+}
+
+
 void tick_fn(HGL_State* state) {
 	String* buffer = &state->buffer;
 	Vector2 mouse = GetMousePosition();
 
 	const n32 WINDOW_WIDTH = GetScreenWidth();
 	const n32 WINDOW_HEIGHT = GetScreenHeight();
-	const n32 BAR_WIDTH = 4*PAD;
-	const n32 EVENT_SIDEBAR_WIDTH = 300 + BAR_WIDTH + DPAD;
 
-	n8 max_events;
+	n8 events_shown;
 	Rectangle event_rect = {0};
 	event_rect.x = WINDOW_WIDTH - EVENT_SIDEBAR_WIDTH + PAD;
-	event_rect.width = EVENT_SIDEBAR_WIDTH - DPAD;
+	event_rect.width = EVENT_SIDEBAR_WIDTH  - BAR_WIDTH - DPAD - HPAD;
 	event_rect.height = FONT_SIZE * 2 + PAD;
-	max_events = (WINDOW_HEIGHT - 4 * PAD) / (event_rect.height + PAD);
+	events_shown = (WINDOW_HEIGHT - DPAD) / (event_rect.height + PAD);
 
 	BeginDrawing();
 	ClearBackground(CLR_BACKG);
@@ -101,7 +116,7 @@ void tick_fn(HGL_State* state) {
 	ntos(tick_string, TICK_STR_LEN, state->tick);
 	{
 		n8 text_width = MeasureText("2", FONT_SIZE) * strlen(tick_string);
-		DrawText(tick_string, WINDOW_WIDTH - PAD - text_width,
+		DrawText(tick_string, WINDOW_WIDTH - EVENT_SIDEBAR_WIDTH - DPAD - text_width,
 				PAD, FONT_SIZE, CLR_DEBUG);
 		state->tick++;
 	}
@@ -109,29 +124,24 @@ void tick_fn(HGL_State* state) {
 
 	/* Handle input */
 	if(IsKeyPressed(KEY_DOWN)) {
-		state->cevent_index = (state->cevent_index + 1) % state->events.count;
+		state->cevent_index++;
+		if(state->cevent_index >= state->events.count)
+			state->cevent_index = 0;
 
-		if(state->offset + max_events >= state->cevent_index) {
-		/* if(state->cevent_index % max_events == 0) {*/
-			assert(state->events.count <= (n32)0xFFFFFFFF);
-			state->offset = clamp(0, state->cevent_index / max_events * 7,
-					(n32)state->events.count);
-		}
+		state->offset = clamp(0,
+				(state->cevent_index / events_shown) * events_shown,
+				state->events.count - events_shown);
 	}
 
 	if(IsKeyPressed(KEY_UP)) {
-		assert(state->events.count <= (n32)0xFFFFFFFF);
-		state->cevent_index = min(state->cevent_index - 1, (n32)state->events.count);
+		state->cevent_index--;
+		if(state->cevent_index > state->events.count)
+			state->cevent_index = state->events.count - 1;
 
-		if(state->cevent_index < state->offset) {
-		/* if(state->cevent_index % max_events == 0) */
-		/* { */
-			state->offset = clamp(0, (state->cevent_index / max_events) * 7,
-					(n32)state->events.count);
-		}
+		state->offset = clamp(0,
+				(state->cevent_index / events_shown) * events_shown,
+				state->events.count - events_shown);
 	}
-
-
 
 
 	/* Design
@@ -147,14 +157,14 @@ void tick_fn(HGL_State* state) {
 
 	{
 		n16 i;
-		for(i = 0; i < max_events + 1; ++i) {
+		for(i = 0; i < events_shown + 1; ++i) {
 			n32 event_id = (i + state->offset) % state->events.count;
 			MEvent event = state->events.items[event_id];
 
 			Color color = CLR_FOREG;
 			bool hovering;
 
-			event_rect.y = 4 * PAD + (event_rect.height + PAD) * i;
+			event_rect.y = PAD + (event_rect.height + PAD) * i;
 			hovering = CollisionPointRec(mouse, event_rect);
 
 			/* Handle inputs */
@@ -183,7 +193,7 @@ void tick_fn(HGL_State* state) {
 				case MALLOC:
 					/* #1 MALLOC 64B */
 					buffer->count = 1 + snprintf(buffer->chars,
-							buffer->capacity, "#%lu %s %dB", event_id,
+							buffer->capacity, "#%u %s %dB", event_id,
 							EVENT_TYPE_LABEL[event.type], event.as.malloc.size);
 					break;
 					/* 0xABCDEF01 */
@@ -191,7 +201,7 @@ void tick_fn(HGL_State* state) {
 				case REALLOC:
 					/* #1 REALLOC 0xABC 64B */
 					buffer->count = 1 + snprintf(buffer->chars,
-							buffer->capacity, "#%lu %s 0x%x %dB", event_id,
+							buffer->capacity, "#%u %s 0x%x %dB", event_id,
 							EVENT_TYPE_LABEL[event.type], event.as.realloc.fptr,
 							event.as.realloc.new_size);
 					break;
@@ -200,7 +210,7 @@ void tick_fn(HGL_State* state) {
 				case CALLOC:
 					/* #1 CALLOC 1 64b */
 					buffer->count = 1 + snprintf(buffer->chars,
-							buffer->capacity, "#%lu %s %d %dB", event_id,
+							buffer->capacity, "#%u %s %d %dB", event_id,
 							EVENT_TYPE_LABEL[event.type], event.as.calloc.memb,
 							event.as.calloc.size);
 					break;
@@ -209,7 +219,7 @@ void tick_fn(HGL_State* state) {
 				case FREE:
 					/* #1 FREE 0xABC */
 					buffer->count = 1 + snprintf(buffer->chars,
-							buffer->capacity, "#%lu %s 0x%x", event_id,
+							buffer->capacity, "#%u %s 0x%x", event_id,
 							EVENT_TYPE_LABEL[event.type], event.as.free.ptr);
 					break;
 
@@ -230,13 +240,15 @@ void tick_fn(HGL_State* state) {
 					case MALLOC:
 						/* 0xABCDEF01 */
 						buffer->count = 1 + snprintf(buffer->chars,
-								buffer->capacity, "0x%x", event.as.malloc.rptr);
+								buffer->capacity, "0x%x",
+								event.as.malloc.rptr);
 						break;
 
 					case REALLOC:
 						/* 0xABCDEF012345678 */
 						buffer->count = 1 + snprintf(buffer->chars,
-								buffer->capacity, "0x%x", event.as.realloc.rptr);
+								buffer->capacity, "0x%x",
+								event.as.realloc.rptr);
 						break;
 
 					case CALLOC:
@@ -246,19 +258,12 @@ void tick_fn(HGL_State* state) {
 								event.as.calloc.rptr);
 						break;
 
-					case FREE:
-						/* #1 FREE 0xABC */
-						buffer->count = 1 + snprintf(buffer->chars, buffer->capacity, "#%lu %s 0x%x",
-								i, EVENT_TYPE_LABEL[event.type], event.as.free.ptr);
-						break;
-
+					case FREE: break;
 					default: assert(0);
 				}
 
 				DrawText(buffer->chars, event_rect.x + HPAD, event_rect.y + FONT_SIZE + HPAD, FONT_SIZE, color);
-
 			}
-
 		}
 	}
 
@@ -283,22 +288,27 @@ void tick_fn(HGL_State* state) {
 		hover_queue = CollisionPointRec(mouse, rect);
 		DrawRectangleLinesEx(rect, BORD, CLR_FOREG);
 		if(hover_queue) {
-			float off = GetMouseWheelMove();
+			i8 off = (i8)GetMouseWheelMove();
+			assert(off == -1 || off == 0 || off == 1);
 
-			assert(state->events.count <= (n32)0xFFFFFFFF);
-			if(off < 0) {
-				state->offset = clamp(0, state->offset + 1, (n32)state->events.count);
-			} else if(off > 0) {
-				state->offset = clamp(0, state->offset - 1, (n32)state->events.count);
+			state->offset -= off;
+			if(off == -1) { /* Down v */
+				if(state->offset - events_shown > state->events.count)
+					state->offset = state->events.count - events_shown - 1;
+			}
+
+			if(off == 1) { /* Up ^ */
+				if(state->offset >= state->events.count)
+					state->offset = 0;
 			}
 		}
 
 		/* Scroll bar */
 		rect.x = WINDOW_WIDTH - BAR_WIDTH - PAD;
-		rect.y = 0;
+		rect.y = PAD;
 		rect.width = BAR_WIDTH;
-		rect.height = WINDOW_HEIGHT;
-		DrawRectangleLinesEx(rect, BORD, BLUE);
+		rect.height = WINDOW_HEIGHT - DPAD;
+		draw_bar(rect, state->offset, state->events.count, events_shown, YELLOW);
 
 		/* Draw mouse position */
 		DrawCircleV(mouse, 5, RED);
