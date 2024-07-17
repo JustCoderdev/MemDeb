@@ -1586,7 +1586,7 @@ RLAPI int SetGamepadMappings(
 RLAPI void SetGamepadVibration(
     int gamepad, float leftMotor,
     float rightMotor); /*  Set gamepad vibration for both motors */
-
+ 
 /*  Input-related functions: mouse */
 RLAPI bool IsMouseButtonPressed(
     int button); /*  Check if a mouse button has been pressed once */

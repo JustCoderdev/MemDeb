@@ -78,17 +78,35 @@ void init_fn(HGL_State* state) {
 	state->offset = 0;
 }
 
-void draw_bar(Rectangle bbox, n64 progress, n64 total, n64 visible, Color color) {
+
+void draw_bar(HGL_State* state, Rectangle bbox, n64 progress, n64 total, n64 visible, Color color) {
 	Rectangle cursor = {0};
 	float seg = bbox.height / total;
 
+	cursor.height = seg * visible;
+
+	{
+		/* Handle input */
+		Vector2 mouse = GetMousePosition();
+		bool hovering = CollisionPointRec(mouse, bbox);
+		bool dragging = hovering && IsMouseButtonDown(MOUSE_BUTTON_LEFT);
+
+		SetMouseCursor(dragging ? MOUSE_CURSOR_POINTING_HAND : MOUSE_CURSOR_DEFAULT);
+		if(dragging) {
+			float ccenter = cursor.height / 2;
+			float mouseprog = clamp(bbox.y, mouse.y - ccenter, bbox.y + bbox.height - cursor.height);
+			progress = max(0, mouseprog - ccenter) / seg;
+			state->offset = progress;
+		}
+	}
+
 	cursor.width = bbox.width;
-	cursor.height = seg * visible; /*  + ((n64)bbox.height % total) */
-	cursor.x = bbox.x;
 	cursor.y = bbox.y + (seg * progress);
+	cursor.x = bbox.x;
 
 	DrawRectangleLinesEx(bbox, BORD, color);
 	DrawRectangleRec(cursor, color);
+
 }
 
 
@@ -293,11 +311,12 @@ void tick_fn(HGL_State* state) {
 
 			state->offset -= off;
 			if(off == -1) { /* Down v */
-				if(state->offset - events_shown > state->events.count)
+				if(state->offset + events_shown >= state->events.count)
 					state->offset = state->events.count - events_shown - 1;
 			}
 
 			if(off == 1) { /* Up ^ */
+				/* IF offset overflows... */
 				if(state->offset >= state->events.count)
 					state->offset = 0;
 			}
@@ -308,7 +327,8 @@ void tick_fn(HGL_State* state) {
 		rect.y = PAD;
 		rect.width = BAR_WIDTH;
 		rect.height = WINDOW_HEIGHT - DPAD;
-		draw_bar(rect, state->offset, state->events.count, events_shown, YELLOW);
+		draw_bar(state, rect, state->offset, state->events.count,
+				events_shown, CLR_FOREG);
 
 		/* Draw mouse position */
 		DrawCircleV(mouse, 5, RED);

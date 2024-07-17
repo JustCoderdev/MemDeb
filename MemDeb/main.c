@@ -34,7 +34,7 @@ Color htoc(n32 hex) { /* 0x RR GG BB AA */
 /* 4x3  200 800x600  80 320x240  50 200x150 */
 /* 3x2  200 600x400  80 360x240  50 150x100 */
 const n16 WINDOW_WIDTH = 1000;
-const n16 WINDOW_HEIGHT = 500;
+const n16 WINDOW_HEIGHT = 600;
 
 void show_pending_screen(void) {
 	struct timespec duration = {0};
