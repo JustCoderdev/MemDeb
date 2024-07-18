@@ -65,6 +65,7 @@ extern void string_append_(String* string, char chr, char* file, int line);
 extern void string_free_(String* string, char* file, int line);
 
 extern void string_clear(String* string);
+extern void string_fmt(String* string, char* format, ...);
 extern void string_remove(String* string, n64 count);
 extern bool string_equals(String strA, char* strB, n64 strB_len);
 

@@ -102,7 +102,7 @@ void parsedump(char* filepath, MEvents* events) {
 						switch(event.type) {
 							case MALLOC: event.as.malloc.size = data; break;
 							case CALLOC: event.as.calloc.size = data; break;
-							case REALLOC: event.as.realloc.new_size = data; break;
+							case REALLOC: event.as.realloc.size = data; break;
 							case FREE:
 							default: assert(0);
 						}
@@ -199,7 +199,7 @@ void printdump(MEvents events) {
 			case REALLOC:
 				ptr.raw = event.as.realloc.fptr;
 				printf("\tREALLOC %x-%x-%x %d\t", ptr.offset, ptr.page,
-						ptr.address, event.as.realloc.new_size);
+						ptr.address, event.as.realloc.size);
 
 				ptr.raw = event.as.realloc.rptr;
 				printf("%x-%x-%x\n", ptr.offset, ptr.page, ptr.address);
@@ -213,7 +213,6 @@ void printdump(MEvents events) {
 			default: assert(0);
 		}
 	}
-
 }
 
 int main(void) {

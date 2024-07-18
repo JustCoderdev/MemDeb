@@ -3,11 +3,15 @@
 
 #include <core.h>
 
+#include <stdarg.h>
 #include <stdio.h>
+extern int vsnprintf(char* str, size_t size, const char *format, va_list ap);
+
 #include <stdlib.h>
 #include <assert.h>
 #include <errno.h>
 #include <string.h>
+
 
 /* #define DEBUG_STRING_ENABLE 1 */
 
@@ -98,6 +102,16 @@ void string_free_(String* string, char* file, int line) {
 /* Normal aaaaaa */
 void string_clear(String* string) {
 	string->count = 0;
+}
+
+void string_fmt(String* string, char* format, ...) {
+	va_list ptr;
+	va_start(ptr, format);
+
+	string->count = 1 + vsnprintf(string->chars,
+			string->capacity, format, ptr);
+
+	va_end(ptr);
 }
 
 void string_remove(String* string, n64 count) {
