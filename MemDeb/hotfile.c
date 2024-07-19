@@ -12,17 +12,21 @@ extern int snprintf(char* str, size_t size, const char* format, ...);
 
 
 #define HPAD 5
-#define PAD 10
+#define PAD  10
 #define DPAD 20
+#define QPAD 40
 
 #define FONT_SIZE 20
 
 #define HBORD 2
-#define BORD 4
+#define BORD  4
 #define DBORD 8
-
+#define QBORD 16
 
 #define BAR_WIDTH (DPAD)
+
+#define REC_FMT "x %0.1f, y %0.1f, width %0.1f, height %0.1f"
+#define REC(RECT) (RECT).x, (RECT).y, (RECT).width, (RECT).height
 
 /* const Color DARK_RED = {  94,  57,  60, 255 }; */
 const Color DARK_RED = {  53,  20,  24, 255 };
@@ -36,6 +40,16 @@ Color htoc(n32 hex) { /* 0x RR GG BB AA */
 	fcolor.b = hex >> 8;
 	fcolor.a = hex;
 	return fcolor;
+}
+
+Color GetRandomColor(n32 seed) {
+	SetRandomSeed(seed);
+	Color color = {0};
+	color.r = GetRandomValue(0, 255);
+	color.g = GetRandomValue(0, 255);
+	color.b = GetRandomValue(0, 255);
+	color.a = 255;
+	return color;
 }
 
 void cinv(Color* A, Color* B) {
@@ -299,42 +313,89 @@ void draw_list(Rectangle bbox, HGL_State* state, Palette palette)
 }
 
 void tick_fn(HGL_State* state) {
-	const n32 WINDOW_WIDTH = GetScreenWidth();
-	const n32 WINDOW_HEIGHT = GetScreenHeight();
+	const n16 WINDOW_WIDTH = GetScreenWidth();
+	const n16 WINDOW_HEIGHT = GetScreenHeight();
 
 	const Palette palette = state->palette;
+	Rectangle bbox;
 
 	BeginDrawing();
 	ClearBackground(palette.bcolor);
 
-	/* Design
-	 *
-	 * Memory layout  Event que
-	 * +-+-+-+-+-+-+-+-+-+
-	 * |             |   |
-	 * |             |   |
-	 * |             |   |
-	 * |             |   |
-	 * +-+-+-+-+-+-+-+-+-+
-	 * */
+	/* Draw sidebar */
+	bbox.width = 350 + BAR_WIDTH + DPAD;
+	bbox.height = WINDOW_HEIGHT;
+	bbox.x = WINDOW_WIDTH - bbox.width;
+	bbox.y = 0;
+	draw_list(bbox, state, palette);
 
+	/* Draw main content */
 	{
-		Rectangle bbox;
+		const n64 sidebar_width = bbox.width;
+		Rectangle event_bbox;
+		float offx, offy;
+		n64 i;
 
-		/* Extern border */
-		bbox.width = WINDOW_WIDTH;
-		bbox.height = WINDOW_HEIGHT;
-		bbox.x = 0;
-		bbox.y = 0;
+		bbox.width = WINDOW_WIDTH - sidebar_width - PAD - HPAD;
+		bbox.height = WINDOW_HEIGHT - DPAD - QPAD;
+		bbox.x = PAD;
+		bbox.y = QPAD;
 		DrawRectangleLinesEx(bbox, BORD, palette.fcolor);
 
-		/* Draw sidebar */
-		bbox.width = 350 + BAR_WIDTH + DPAD;
-		bbox.height = WINDOW_HEIGHT;
-		bbox.x = WINDOW_WIDTH - bbox.width;
-		bbox.y = 0;
-		draw_list(bbox, state, palette);
+		offx = (bbox.width - DPAD) / 4096; /* max address */
+		/* offx = 1; /1* max address *1/ */
+		offy = (bbox.height - DPAD) / 16; /* max pages */
+
+		assert(state->cevent_index < state->events.count);
+		printf("#%lu: %u\n", state->cevent_index, state->events.items[state->cevent_index].as.malloc.size);
+
+		event_bbox.height = offy - HPAD;
+		for(i = 0; i <= state->cevent_index
+				&& state->cevent_index < state->events.count; ++i)
+		{
+			MEvent event = state->events.items[i];
+
+			switch(event.type) {
+				case MALLOC:
+					event_bbox.width = offx * event.as.malloc.size;
+					event_bbox.x = bbox.x + PAD + offx * event.as.malloc.rptr.address;
+					event_bbox.y = bbox.y + PAD + offy * event.as.malloc.rptr.page;
+					DrawRectangleRec(event_bbox, GetRandomColor(event.as.malloc.rptr.raw));
+					break;
+
+				case CALLOC:
+					event_bbox.width = offx * event.as.calloc.size * event.as.calloc.memb;
+					event_bbox.x = bbox.x + PAD + offx * event.as.calloc.rptr.address;
+					event_bbox.y = bbox.y + PAD + offy * event.as.calloc.rptr.page;
+					DrawRectangleRec(event_bbox, GetRandomColor(event.as.calloc.rptr.raw));
+					break;
+
+				case REALLOC:
+					/* FREE */
+
+					/* MALLOC */
+					event_bbox.width = offx * event.as.realloc.size;
+					event_bbox.x = bbox.x + PAD + offx * event.as.realloc.rptr.address;
+					event_bbox.y = bbox.y + PAD + offy * event.as.realloc.rptr.page;
+					DrawRectangleRec(event_bbox, GetRandomColor(event.as.realloc.rptr.raw));
+					break;
+
+				case FREE:
+					/* event_bbox.width = offx * event.as.free.ptr; */
+					/* event_bbox.x = bbox.x + PAD + offx * ((Ptr)event.as.malloc.rptr).address; */
+					/* event_bbox.y = bbox.y + PAD + offy * ((Ptr)event.as.malloc.rptr).page; */
+					/* DrawRectangleRec(event_bbox, GetRandomColor(event.as.malloc.rptr)); */
+					break;
+			}
+		}
 	}
+
+	/* Extern border */
+	bbox.width = WINDOW_WIDTH;
+	bbox.height = WINDOW_HEIGHT;
+	bbox.x = 0;
+	bbox.y = 0;
+	DrawRectangleLinesEx(bbox, BORD, palette.fcolor);
 
 
 #if DEBUG_ENABLE
@@ -344,7 +405,7 @@ void tick_fn(HGL_State* state) {
 	ntos(tick_string, TICK_STR_LEN, state->tick);
 	{
 		n8 text_width = MeasureText("2", FONT_SIZE) * strlen(tick_string);
-		DrawText(tick_string, WINDOW_WIDTH - 500 - DPAD - text_width,
+		DrawText(tick_string, WINDOW_WIDTH - 390 - DPAD - text_width,
 				PAD, FONT_SIZE, CLR_DEBUG);
 		state->tick++;
 	}

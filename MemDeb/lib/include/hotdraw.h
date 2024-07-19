@@ -4,16 +4,25 @@
 #include <core.h>
 #include <raylib.h>
 
+typedef union Ptr {
+	n32 raw;
+	struct { /* Reversed order */
+		unsigned address: 12;
+		unsigned page: 4;
+		unsigned offset: 16;
+	};
+} Ptr;
+
 typedef enum MEvent_Type { MALLOC = 0, CALLOC, REALLOC, FREE } MEvent_Type;
 typedef struct MEvent {
 	String file_line;
 	MEvent_Type type;
 
 	union {
-		struct {           n32 size; n32 rptr; } malloc;
-		struct { n32 memb; n32 size; n32 rptr; } calloc;
-		struct { n32 fptr; n32 size; n32 rptr; } realloc;
-		struct { n32 ptr;                      } free;
+		struct {           n32 size; Ptr rptr; } malloc;
+		struct { n32 memb; n32 size; Ptr rptr; } calloc;
+		struct { Ptr fptr; n32 size; Ptr rptr; } realloc;
+		struct { Ptr ptr;                      } free;
 	} as;
 } MEvent;
 

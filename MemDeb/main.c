@@ -13,15 +13,6 @@ int nanosleep(const struct timespec *req, struct timespec *rem);
 
 #define DL_PATH ("libhotfile.so")
 
-typedef union Ptr {
-	n32 raw;
-	struct { /* Reversed order */
-		unsigned address: 12;
-		unsigned page: 4;
-		unsigned offset: 16;
-	};
-} Ptr;
-
 Color htoc(n32 hex) { /* 0x RR GG BB AA */
 	Color color = {0};
 	color.r = hex >> 24;
@@ -63,7 +54,7 @@ void parsedump(char* filepath, MEvents* events) {
 	while((c = getc(file)) != EOF) {
 		switch(c) {
 			case '\n': {
-				n64 data;
+				n32 data;
 
 				string_nterm(&buffer);
 
@@ -72,10 +63,10 @@ void parsedump(char* filepath, MEvents* events) {
  				assert(!errno);
 
 				switch(event.type) {
-					case MALLOC: event.as.malloc.rptr = data; break;
-					case CALLOC: event.as.calloc.rptr = data; break;
-					case REALLOC: event.as.realloc.rptr = data; break;
-					case FREE: event.as.free.ptr = data; break;
+					case MALLOC:  event.as.malloc.rptr.raw = data; break;
+					case CALLOC:  event.as.calloc.rptr.raw = data; break;
+					case REALLOC: event.as.realloc.rptr.raw = data; break;
+					case FREE:    event.as.free.ptr.raw = data; break;
 					default: assert(0);
 				}
 				arr_append(events, event);
@@ -149,7 +140,7 @@ void parsedump(char* filepath, MEvents* events) {
 
 							case REALLOC:
 								errno = 0;
-								event.as.realloc.fptr = strtol(buffer.chars, NULL, 16);
+								event.as.realloc.fptr.raw = strtol(buffer.chars, NULL, 16);
 								assert(!errno);
 								break;
 
@@ -184,29 +175,29 @@ void printdump(MEvents events) {
 
 		switch(event.type) {
 			case MALLOC:
-				ptr.raw = event.as.malloc.rptr;
+				ptr = event.as.malloc.rptr;
 				printf("\tMALLOC %d\t%x-%x-%x\n",
 						event.as.malloc.size, ptr.offset, ptr.page, ptr.address);
 				break;
 
 			case CALLOC:
-				ptr.raw = event.as.calloc.rptr;
+				ptr = event.as.calloc.rptr;
 				printf("\tCALLOC %d %d\t%x-%x-%x\n",
 						event.as.calloc.memb, event.as.calloc.size,
 						ptr.offset, ptr.page, ptr.address);
 				break;
 
 			case REALLOC:
-				ptr.raw = event.as.realloc.fptr;
+				ptr = event.as.realloc.fptr;
 				printf("\tREALLOC %x-%x-%x %d\t", ptr.offset, ptr.page,
 						ptr.address, event.as.realloc.size);
 
-				ptr.raw = event.as.realloc.rptr;
+				ptr = event.as.realloc.rptr;
 				printf("%x-%x-%x\n", ptr.offset, ptr.page, ptr.address);
 				break;
 
 			case FREE:
-				ptr.raw = event.as.free.ptr;
+				ptr = event.as.free.ptr;
 				printf("\tFREE %x-%x-%x\n", ptr.offset, ptr.page, ptr.address);
 				break;
 
@@ -220,7 +211,8 @@ int main(void) {
 	n64 tick = 0;
 
 	parsedump("memdump", &state.events);
-	/* printdump(state.events); */
+	printdump(state.events);
+	return 1;
 
 	if(HGL_load(DL_PATH)) exit(failure);
 
