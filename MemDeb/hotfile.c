@@ -332,8 +332,8 @@ n32 getSizeOfEvent(MEvents events, n32 offset, Ptr ptr) {
 	i64 i;
 
 	assert(ptr.raw);
-	assert(offset < events.count);
-	for(i = offset; i >=0; --i) {
+	assert(offset > 0 && offset < events.count);
+	for(i = offset - 1; i >= 0; --i) {
 		MEvent ev = events.items[i];
 		switch(ev.type) {
 			case MALLOC:
@@ -351,7 +351,8 @@ n32 getSizeOfEvent(MEvents events, n32 offset, Ptr ptr) {
 					return ev.as.realloc.size;
 				break;
 
-			case FREE: break;
+			case FREE:
+			default: assert(0);
 		}
 	}
 
