@@ -351,7 +351,8 @@ n32 getSizeOfEvent(MEvents events, n32 offset, Ptr ptr) {
 					return ev.as.realloc.size;
 				break;
 
-			case FREE:
+			case FREE: break;
+
 			default: assert(0);
 		}
 	}
