@@ -112,7 +112,9 @@ void draw_bar(Rectangle bbox, n64* progress, n64 total, n64 visible_items, Palet
 	Rectangle cursor = {0};
 	float seg = bbox.height / total;
 
+	cursor.width = bbox.width;
 	cursor.height = seg * visible_items;
+	cursor.x = bbox.x;
 
 	{
 		/* Handle input */
@@ -128,9 +130,7 @@ void draw_bar(Rectangle bbox, n64* progress, n64 total, n64 visible_items, Palet
 		}
 	}
 
-	cursor.width = bbox.width;
 	cursor.y = bbox.y + (*progress * seg);
-	cursor.x = bbox.x;
 
 	DrawRectangleLinesEx(bbox, BORD, palette.fcolor);
 	DrawRectangleRec(cursor, palette.fcolor);
