@@ -55,7 +55,7 @@ typedef struct String {
 #define string_cpy(STRING, TEXT, TEXT_LEN) string_cpy_(STRING, TEXT, TEXT_LEN, __FILE__, __LINE__)
 #define string_nterm(STRING) string_nterm_(STRING, __FILE__, __LINE__)
 #define string_append(STRING, CHR) string_append_(STRING, CHR, __FILE__, __LINE__)
-#define string_free(string) string_free_(STRING, __FILE__, __LINE__)
+#define string_free(STRING) string_free_(STRING, __FILE__, __LINE__)
 
 extern void string_new_(String* string, n64 capacity, char* file, int line);
 extern void string_new_from_(String* string, char* text, n64 text_len, char* file, int line);

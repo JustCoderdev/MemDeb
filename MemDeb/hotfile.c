@@ -31,6 +31,7 @@ extern int snprintf(char* str, size_t size, const char* format, ...);
 /* const Color DARK_RED = {  94,  57,  60, 255 }; */
 const Color DARK_RED = {  53,  20,  24, 255 };
 const Color RED      = { 230,  41,  55, 255 };
+const Color WHITE    = { 255, 255, 255, 255 };
 const char* EVENT_TYPE_LABEL[4] = { "MALLOC", "CALLOC", "REALLOC", "FREE" };
 
 Color htoc(n32 hex) { /* 0x RR GG BB AA */
@@ -312,6 +313,52 @@ void draw_list(Rectangle bbox, HGL_State* state, Palette palette)
 	}
 }
 
+void render_allocation(Rectangle bbox, Ptr ptr, n32 size, Color color, float offx, float offy) {
+	n32 page = ptr.page;
+	n32 addr = ptr.address;
+
+	do {
+		n32 draw_size = (addr + size > 4096) ? 4096 - addr : size;
+		DrawRectangle(bbox.x + offx * addr, bbox.y + offy * page,
+		              offx * draw_size, bbox.height, color);
+
+		size -= draw_size;
+		if(size > 0) { page++; addr = 0; }
+	}
+	while(size > 0);
+}
+
+n32 getSizeOfEvent(MEvents events, n32 offset, Ptr ptr) {
+	i64 i;
+
+	assert(ptr.raw);
+	assert(offset < events.count);
+	for(i = offset; i >=0; --i) {
+		MEvent ev = events.items[i];
+		switch(ev.type) {
+			case MALLOC:
+				if(ev.as.malloc.rptr.raw == ptr.raw)
+					return ev.as.malloc.size;
+				break;
+
+			case CALLOC:
+				if(ev.as.calloc.rptr.raw == ptr.raw)
+					return ev.as.calloc.size * ev.as.calloc.memb;
+				break;
+
+			case REALLOC:
+				if(ev.as.realloc.rptr.raw == ptr.raw)
+					return ev.as.realloc.size;
+				break;
+
+			case FREE: break;
+		}
+	}
+
+	printf("Pointer %x-%x-%x not found?\n", ptr.offset, ptr.page, ptr.address);
+	exit(failure);
+}
+
 void tick_fn(HGL_State* state) {
 	const n16 WINDOW_WIDTH = GetScreenWidth();
 	const n16 WINDOW_HEIGHT = GetScreenHeight();
@@ -343,49 +390,67 @@ void tick_fn(HGL_State* state) {
 		DrawRectangleLinesEx(bbox, BORD, palette.fcolor);
 
 		offx = (bbox.width - DPAD) / 4096; /* max address */
-		/* offx = 1; /1* max address *1/ */
 		offy = (bbox.height - DPAD) / 16; /* max pages */
 
-		assert(state->cevent_index < state->events.count);
-		printf("#%lu: %u\n", state->cevent_index, state->events.items[state->cevent_index].as.malloc.size);
+		/* assert(state->cevent_index < state->events.count); */
+		/* { */
+		/* 	n64 i = state->cevent_index; */
+		/* 	MEvent event = state->events.items[i]; */
+		/* 	switch(event.type) { */
+		/* 		case MALLOC: printf("\r#%lu: %8.u", i, event.as.malloc.size);break; */
+		/* 		case CALLOC: printf("\r#%lu: %8.u", i, event.as.calloc.size * event.as.calloc.memb);break; */
+		/* 		case REALLOC: printf("\r#%lu: %8.u", i, event.as.realloc.size); break; */
+		/* 		case FREE:break; */
+		/* 	} */
+		/* 	fflush(stdout); */
+		/* } */
 
 		event_bbox.height = offy - HPAD;
+		event_bbox.x = bbox.x + PAD;
+		event_bbox.y = bbox.y + PAD;
+
 		for(i = 0; i <= state->cevent_index
 				&& state->cevent_index < state->events.count; ++i)
 		{
 			MEvent event = state->events.items[i];
-
 			switch(event.type) {
-				case MALLOC:
-					event_bbox.width = offx * event.as.malloc.size;
-					event_bbox.x = bbox.x + PAD + offx * event.as.malloc.rptr.address;
-					event_bbox.y = bbox.y + PAD + offy * event.as.malloc.rptr.page;
-					DrawRectangleRec(event_bbox, GetRandomColor(event.as.malloc.rptr.raw));
+				case MALLOC: {
+					Color color = GetRandomColor(event.as.malloc.rptr.raw);
+					render_allocation(event_bbox, event.as.malloc.rptr,
+							event.as.malloc.size, color, offx, offy);
 					break;
+				}
 
-				case CALLOC:
-					event_bbox.width = offx * event.as.calloc.size * event.as.calloc.memb;
-					event_bbox.x = bbox.x + PAD + offx * event.as.calloc.rptr.address;
-					event_bbox.y = bbox.y + PAD + offy * event.as.calloc.rptr.page;
-					DrawRectangleRec(event_bbox, GetRandomColor(event.as.calloc.rptr.raw));
+				case CALLOC: {
+					Color color = GetRandomColor(event.as.calloc.rptr.raw);
+					render_allocation(event_bbox, event.as.calloc.rptr,
+							event.as.calloc.size * event.as.calloc.memb,
+							color, offx, offy);
 					break;
+				}
 
-				case REALLOC:
+				case REALLOC: {
+					Color color = GetRandomColor(event.as.realloc.rptr.raw);
+
 					/* FREE */
+					if(event.as.realloc.fptr.raw != 0) {
+						n32 size = getSizeOfEvent(state->events, i, event.as.realloc.fptr);
+						render_allocation(event_bbox, event.as.realloc.fptr,
+						                  size, palette.bcolor, offx, offy);
+					}
 
 					/* MALLOC */
-					event_bbox.width = offx * event.as.realloc.size;
-					event_bbox.x = bbox.x + PAD + offx * event.as.realloc.rptr.address;
-					event_bbox.y = bbox.y + PAD + offy * event.as.realloc.rptr.page;
-					DrawRectangleRec(event_bbox, GetRandomColor(event.as.realloc.rptr.raw));
+					render_allocation(event_bbox, event.as.realloc.rptr,
+							event.as.realloc.size, color, offx, offy);
 					break;
+				}
 
-				case FREE:
-					/* event_bbox.width = offx * event.as.free.ptr; */
-					/* event_bbox.x = bbox.x + PAD + offx * ((Ptr)event.as.malloc.rptr).address; */
-					/* event_bbox.y = bbox.y + PAD + offy * ((Ptr)event.as.malloc.rptr).page; */
-					/* DrawRectangleRec(event_bbox, GetRandomColor(event.as.malloc.rptr)); */
+				case FREE: {
+					n32 size = getSizeOfEvent(state->events, i, event.as.free.ptr);
+					render_allocation(event_bbox, event.as.free.ptr,
+					                  size, palette.bcolor, offx, offy);
 					break;
+				}
 			}
 		}
 	}

@@ -211,8 +211,8 @@ int main(void) {
 	n64 tick = 0;
 
 	parsedump("memdump", &state.events);
-	printdump(state.events);
-	return 1;
+	/* printdump(state.events); */
+	/* return 1; */
 
 	if(HGL_load(DL_PATH)) exit(failure);
 
