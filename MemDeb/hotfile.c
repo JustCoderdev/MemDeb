@@ -328,6 +328,27 @@ void render_allocation(Rectangle bbox, Ptr ptr, n32 size, Color color, float off
 	while(size > 0);
 }
 
+void render_highlight(Rectangle bbox, Ptr ptr, n32 size, float offx, float offy) {
+	const n8 BORDER = 2;
+	n32 page = ptr.page;
+	n32 addr = ptr.address;
+
+	do {
+		n32 draw_size = (addr + size > 4096) ? 4096 - addr : size;
+		Rectangle hbox = {
+			bbox.x + offx * addr - BORDER/2,
+			bbox.y + offy * page - BORDER/2,
+			offx * draw_size     + BORDER,
+			bbox.height          + BORDER
+		};
+		DrawRectangleLinesEx(hbox, BORDER, RED);
+
+		size -= draw_size;
+		if(size > 0) { page++; addr = 0; }
+	}
+	while(size > 0);
+}
+
 n32 getSizeOfEvent(MEvents events, n32 offset, Ptr ptr) {
 	i64 i;
 
@@ -394,6 +415,7 @@ void tick_fn(HGL_State* state) {
 		offx = (bbox.width - DPAD) / 4096; /* max address */
 		offy = (bbox.height - DPAD) / 16; /* max pages */
 
+		/* Debug print current size */
 		/* assert(state->cevent_index < state->events.count); */
 		/* { */
 		/* 	n64 i = state->cevent_index; */
@@ -415,37 +437,31 @@ void tick_fn(HGL_State* state) {
 				&& state->cevent_index < state->events.count; ++i)
 		{
 			MEvent event = state->events.items[i];
+			Color color;
 			switch(event.type) {
-				case MALLOC: {
-					Color color = GetRandomColor(event.as.malloc.rptr.raw);
+				case MALLOC:
+					color = GetRandomColor(event.as.malloc.rptr.raw);
 					render_allocation(event_bbox, event.as.malloc.rptr,
 							event.as.malloc.size, color, offx, offy);
 					break;
-				}
 
-				case CALLOC: {
-					Color color = GetRandomColor(event.as.calloc.rptr.raw);
+				case CALLOC:
+					color = GetRandomColor(event.as.calloc.rptr.raw);
 					render_allocation(event_bbox, event.as.calloc.rptr,
 							event.as.calloc.size * event.as.calloc.memb,
 							color, offx, offy);
 					break;
-				}
 
-				case REALLOC: {
-					Color color = GetRandomColor(event.as.realloc.rptr.raw);
-
-					/* FREE */
+				case REALLOC:
+					color = GetRandomColor(event.as.realloc.rptr.raw);
 					if(event.as.realloc.fptr.raw != 0) {
 						n32 size = getSizeOfEvent(state->events, i, event.as.realloc.fptr);
 						render_allocation(event_bbox, event.as.realloc.fptr,
 						                  size, palette.bcolor, offx, offy);
 					}
-
-					/* MALLOC */
 					render_allocation(event_bbox, event.as.realloc.rptr,
 							event.as.realloc.size, color, offx, offy);
 					break;
-				}
 
 				case FREE: {
 					n32 size = getSizeOfEvent(state->events, i, event.as.free.ptr);
@@ -455,6 +471,47 @@ void tick_fn(HGL_State* state) {
 				}
 			}
 		}
+
+		/* Draw highlight */
+		assert(state->cevent_index < state->events.count);
+		{
+			n64 i = state->cevent_index;
+			MEvent event = state->events.items[i];
+			n32 size = 0;
+			Ptr ptr = {0};
+
+			switch(event.type) {
+				case MALLOC:
+					size = event.as.malloc.size;
+					ptr = event.as.malloc.rptr;
+					break;
+
+				case CALLOC:
+					size = event.as.calloc.size * event.as.calloc.memb;
+					ptr = event.as.calloc.rptr;
+					break;
+
+				case REALLOC:
+					size = event.as.realloc.size;
+					ptr = event.as.realloc.rptr;
+
+					/* Render free highlight */
+					if(event.as.realloc.fptr.raw != 0) {
+					render_highlight(event_bbox, event.as.realloc.fptr,
+							getSizeOfEvent(state->events, i, event.as.realloc.fptr),
+							offx, offy);
+					}
+					break;
+
+				case FREE:
+					size = getSizeOfEvent(state->events, i, event.as.free.ptr);
+					ptr = event.as.free.ptr;
+					break;
+			}
+
+			render_highlight(event_bbox, ptr, size, offx, offy);
+		}
+
 	}
 
 	/* Extern border */
