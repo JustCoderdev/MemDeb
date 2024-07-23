@@ -6,8 +6,6 @@
 #include <assert.h>
 #include <stdlib.h>
 #include <stdio.h>
-extern int snprintf(char* str, size_t size, const char* format, ...);
-
 #include <raylib.h>
 
 
@@ -122,6 +120,7 @@ void draw_bar(Rectangle bbox, n64* progress, n64 total, n64 visible_items, Palet
 		Vector2 mouse = GetMousePosition();
 		bool hovering = CollisionPointRec(mouse, bbox);
 		bool dragging = hovering && IsMouseButtonDown(MOUSE_BUTTON_LEFT);
+		bool shifting = IsKeyPressed(KEY_LEFT_SHIFT) || IsKeyPressed(KEY_RIGHT_SHIFT);
 
 		SetMouseCursor(dragging ? MOUSE_CURSOR_POINTING_HAND : MOUSE_CURSOR_DEFAULT);
 		if(dragging) {
@@ -373,13 +372,107 @@ n32 getSizeOfEvent(MEvents events, n32 offset, Ptr ptr) {
 				break;
 
 			case FREE: break;
-
 			default: assert(0);
 		}
 	}
 
 	printf("Pointer %x-%x-%x not found?\n", ptr.offset, ptr.page, ptr.address);
 	exit(failure);
+}
+
+void draw_mainview(Rectangle bbox, HGL_State* state, Palette palette) {
+	Rectangle event_bbox;
+	float offx, offy;
+	n64 i;
+
+	/* Draw exterior */
+	DrawRectangleLinesEx(bbox, BORD, palette.fcolor);
+
+	offx = (bbox.width - DPAD) / 4096; /* max address */
+	offy = (bbox.height - DPAD) / 16; /* max pages */
+
+	event_bbox.height = offy - HPAD;
+	event_bbox.x = bbox.x + PAD;
+	event_bbox.y = bbox.y + PAD;
+
+	for(i = 0; i <= state->cevent_index
+			&& state->cevent_index < state->events.count; ++i)
+	{
+		MEvent event = state->events.items[i];
+		Color color;
+		switch(event.type) {
+			case MALLOC:
+				color = GetRandomColor(event.as.malloc.rptr.raw);
+				render_allocation(event_bbox, event.as.malloc.rptr,
+						event.as.malloc.size, color, offx, offy);
+				break;
+
+			case CALLOC:
+				color = GetRandomColor(event.as.calloc.rptr.raw);
+				render_allocation(event_bbox, event.as.calloc.rptr,
+						event.as.calloc.size * event.as.calloc.memb,
+						color, offx, offy);
+				break;
+
+			case REALLOC:
+				color = GetRandomColor(event.as.realloc.rptr.raw);
+				if(event.as.realloc.fptr.raw != 0) {
+					n32 size = getSizeOfEvent(state->events, i, event.as.realloc.fptr);
+					render_allocation(event_bbox, event.as.realloc.fptr,
+									  size, palette.bcolor, offx, offy);
+				}
+				render_allocation(event_bbox, event.as.realloc.rptr,
+						event.as.realloc.size, color, offx, offy);
+				break;
+
+			case FREE: {
+				n32 size = getSizeOfEvent(state->events, i, event.as.free.ptr);
+				render_allocation(event_bbox, event.as.free.ptr,
+								  size, palette.bcolor, offx, offy);
+				break;
+			}
+		}
+	}
+
+	/* Draw highlight */
+	assert(state->cevent_index < state->events.count);
+	{
+		n64 i = state->cevent_index;
+		MEvent event = state->events.items[i];
+		n32 size = 0;
+		Ptr ptr = {0};
+
+		switch(event.type) {
+			case MALLOC:
+				size = event.as.malloc.size;
+				ptr = event.as.malloc.rptr;
+				break;
+
+			case CALLOC:
+				size = event.as.calloc.size * event.as.calloc.memb;
+				ptr = event.as.calloc.rptr;
+				break;
+
+			case REALLOC:
+				size = event.as.realloc.size;
+				ptr = event.as.realloc.rptr;
+
+				/* Render free highlight */
+				if(event.as.realloc.fptr.raw != 0) {
+				render_highlight(event_bbox, event.as.realloc.fptr,
+						getSizeOfEvent(state->events, i, event.as.realloc.fptr),
+						offx, offy);
+				}
+				break;
+
+			case FREE:
+				size = getSizeOfEvent(state->events, i, event.as.free.ptr);
+				ptr = event.as.free.ptr;
+				break;
+		}
+
+		render_highlight(event_bbox, ptr, size, offx, offy);
+	}
 }
 
 void tick_fn(HGL_State* state) {
@@ -399,120 +492,12 @@ void tick_fn(HGL_State* state) {
 	bbox.y = 0;
 	draw_list(bbox, state, palette);
 
-	/* Draw main content */
-	{
-		const n64 sidebar_width = bbox.width;
-		Rectangle event_bbox;
-		float offx, offy;
-		n64 i;
-
-		bbox.width = WINDOW_WIDTH - sidebar_width - PAD - HPAD;
-		bbox.height = WINDOW_HEIGHT - DPAD - QPAD;
-		bbox.x = PAD;
-		bbox.y = QPAD;
-		DrawRectangleLinesEx(bbox, BORD, palette.fcolor);
-
-		offx = (bbox.width - DPAD) / 4096; /* max address */
-		offy = (bbox.height - DPAD) / 16; /* max pages */
-
-		/* Debug print current size */
-		/* assert(state->cevent_index < state->events.count); */
-		/* { */
-		/* 	n64 i = state->cevent_index; */
-		/* 	MEvent event = state->events.items[i]; */
-		/* 	switch(event.type) { */
-		/* 		case MALLOC: printf("\r#%lu: %8.u", i, event.as.malloc.size);break; */
-		/* 		case CALLOC: printf("\r#%lu: %8.u", i, event.as.calloc.size * event.as.calloc.memb);break; */
-		/* 		case REALLOC: printf("\r#%lu: %8.u", i, event.as.realloc.size); break; */
-		/* 		case FREE:break; */
-		/* 	} */
-		/* 	fflush(stdout); */
-		/* } */
-
-		event_bbox.height = offy - HPAD;
-		event_bbox.x = bbox.x + PAD;
-		event_bbox.y = bbox.y + PAD;
-
-		for(i = 0; i <= state->cevent_index
-				&& state->cevent_index < state->events.count; ++i)
-		{
-			MEvent event = state->events.items[i];
-			Color color;
-			switch(event.type) {
-				case MALLOC:
-					color = GetRandomColor(event.as.malloc.rptr.raw);
-					render_allocation(event_bbox, event.as.malloc.rptr,
-							event.as.malloc.size, color, offx, offy);
-					break;
-
-				case CALLOC:
-					color = GetRandomColor(event.as.calloc.rptr.raw);
-					render_allocation(event_bbox, event.as.calloc.rptr,
-							event.as.calloc.size * event.as.calloc.memb,
-							color, offx, offy);
-					break;
-
-				case REALLOC:
-					color = GetRandomColor(event.as.realloc.rptr.raw);
-					if(event.as.realloc.fptr.raw != 0) {
-						n32 size = getSizeOfEvent(state->events, i, event.as.realloc.fptr);
-						render_allocation(event_bbox, event.as.realloc.fptr,
-						                  size, palette.bcolor, offx, offy);
-					}
-					render_allocation(event_bbox, event.as.realloc.rptr,
-							event.as.realloc.size, color, offx, offy);
-					break;
-
-				case FREE: {
-					n32 size = getSizeOfEvent(state->events, i, event.as.free.ptr);
-					render_allocation(event_bbox, event.as.free.ptr,
-					                  size, palette.bcolor, offx, offy);
-					break;
-				}
-			}
-		}
-
-		/* Draw highlight */
-		assert(state->cevent_index < state->events.count);
-		{
-			n64 i = state->cevent_index;
-			MEvent event = state->events.items[i];
-			n32 size = 0;
-			Ptr ptr = {0};
-
-			switch(event.type) {
-				case MALLOC:
-					size = event.as.malloc.size;
-					ptr = event.as.malloc.rptr;
-					break;
-
-				case CALLOC:
-					size = event.as.calloc.size * event.as.calloc.memb;
-					ptr = event.as.calloc.rptr;
-					break;
-
-				case REALLOC:
-					size = event.as.realloc.size;
-					ptr = event.as.realloc.rptr;
-
-					/* Render free highlight */
-					if(event.as.realloc.fptr.raw != 0) {
-					render_highlight(event_bbox, event.as.realloc.fptr,
-							getSizeOfEvent(state->events, i, event.as.realloc.fptr),
-							offx, offy);
-					}
-					break;
-
-				case FREE:
-					size = getSizeOfEvent(state->events, i, event.as.free.ptr);
-					ptr = event.as.free.ptr;
-					break;
-			}
-
-			render_highlight(event_bbox, ptr, size, offx, offy);
-		}
-
-	}
+	/* Draw event view */
+	bbox.width = WINDOW_WIDTH - bbox.width - PAD - HPAD;
+	bbox.height = WINDOW_HEIGHT - DPAD - QPAD;
+	bbox.x = PAD;
+	bbox.y = QPAD;
+	draw_mainview(bbox, state, palette);
 
 	/* Extern border */
 	bbox.width = WINDOW_WIDTH;
