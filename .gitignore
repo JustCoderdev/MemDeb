@@ -1,6 +1,8 @@
+lib/sources/*
 bin/
 
 .old_session.vim
 .session.vim
 
-.DS_Store
+.ldcache
+.project.gf
