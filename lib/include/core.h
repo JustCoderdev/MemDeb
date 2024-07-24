@@ -70,17 +70,10 @@ extern void string_remove(String* string, n64 count);
 extern bool string_equals(String strA, char* strB, n64 strB_len);
 
 /* Memory debug */
-#if DEBUG_MEMDEB_ENABLE
-#	define dmalloc(SIZE) malloc_(SIZE, __FILE__, __LINE__)
-#	define dfree(PTR)    free_(PTR, __FILE__, __LINE__)
-#	define dcalloc(NMEMB, SIZE) calloc_(NMEMB, SIZE, __FILE__, __LINE__)
-#	define drealloc(PTR, SIZE)  realloc_(PTR, SIZE, __FILE__, __LINE__)
-#else
-#	define dmalloc(SIZE) malloc(SIZE)
-#	define dfree(PTR)    free(PTR)
-#	define dcalloc(NMEMB, SIZE) calloc(NMEMB, SIZE)
-#	define drealloc(PTR, SIZE)  realloc(PTR, SIZE)
-#endif
+#define dmalloc(SIZE)        malloc_(SIZE, __FILE__, __LINE__)
+#define dfree(PTR)           free_(PTR, __FILE__, __LINE__)
+#define dcalloc(NMEMB, SIZE) calloc_(NMEMB, SIZE, __FILE__, __LINE__)
+#define drealloc(PTR, SIZE)  realloc_(PTR, SIZE, __FILE__, __LINE__)
 
 extern void *malloc_(size_t size, char* file, int line);
 extern void free_(void* ptr, char* file, int line);
