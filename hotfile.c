@@ -120,7 +120,7 @@ void draw_bar(Rectangle bbox, n64* progress, n64 total, n64 visible_items, Palet
 		Vector2 mouse = GetMousePosition();
 		bool hovering = CollisionPointRec(mouse, bbox);
 		bool dragging = hovering && IsMouseButtonDown(MOUSE_BUTTON_LEFT);
-		bool shifting = IsKeyPressed(KEY_LEFT_SHIFT) || IsKeyPressed(KEY_RIGHT_SHIFT);
+		/* bool shifting = IsKeyPressed(KEY_LEFT_SHIFT) || IsKeyPressed(KEY_RIGHT_SHIFT); */
 
 		SetMouseCursor(dragging ? MOUSE_CURSOR_POINTING_HAND : MOUSE_CURSOR_DEFAULT);
 		if(dragging) {
@@ -312,14 +312,37 @@ void draw_list(Rectangle bbox, HGL_State* state, Palette palette)
 	}
 }
 
-void render_allocation(Rectangle bbox, Ptr ptr, n32 size, Color color, float offx, float offy) {
+void render_allocation(Rectangle bbox, Ptr ptr, n32 size, n64* offset, n64 event_index, Color color, float offx, float offy) {
 	n32 page = ptr.page;
 	n32 addr = ptr.address;
 
 	do {
 		n32 draw_size = (addr + size > 4096) ? 4096 - addr : size;
-		DrawRectangle(bbox.x + offx * addr, bbox.y + offy * page,
-		              offx * draw_size, bbox.height, color);
+		n32 x = bbox.x + offx * addr,
+			y = bbox.y + offy * page,
+			width = offx * draw_size,
+			height = bbox.height;
+
+		DrawRectangle(x, y, width, height, color);
+
+		{
+			/* Handle Input */
+			Vector2 mouse = GetMousePosition();
+			Rectangle box = { x, y, width, height };
+
+			if(CollisionPointRec(mouse, box)) {
+				Rectangle hbox = {
+					x      - HBORD/2, y      - HBORD/2,
+					width  + HBORD,   height + HBORD
+				};
+
+				DrawRectangleLinesEx(hbox, HBORD, RED);
+
+				if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+					*offset = event_index;
+				}
+			}
+		}
 
 		size -= draw_size;
 		if(size > 0) { page++; addr = 0; }
@@ -328,19 +351,18 @@ void render_allocation(Rectangle bbox, Ptr ptr, n32 size, Color color, float off
 }
 
 void render_highlight(Rectangle bbox, Ptr ptr, n32 size, float offx, float offy) {
-	const n8 BORDER = 2;
 	n32 page = ptr.page;
 	n32 addr = ptr.address;
 
 	do {
 		n32 draw_size = (addr + size > 4096) ? 4096 - addr : size;
 		Rectangle hbox = {
-			bbox.x + offx * addr - BORDER/2,
-			bbox.y + offy * page - BORDER/2,
-			offx * draw_size     + BORDER,
-			bbox.height          + BORDER
+			bbox.x + offx * addr - HBORD/2,
+			bbox.y + offy * page - HBORD/2,
+			offx * draw_size     + HBORD,
+			bbox.height          + HBORD
 		};
-		DrawRectangleLinesEx(hbox, BORDER, RED);
+		DrawRectangleLinesEx(hbox, HBORD, RED);
 
 		size -= draw_size;
 		if(size > 0) { page++; addr = 0; }
@@ -404,31 +426,33 @@ void draw_mainview(Rectangle bbox, HGL_State* state, Palette palette) {
 			case MALLOC:
 				color = GetRandomColor(event.as.malloc.rptr.raw);
 				render_allocation(event_bbox, event.as.malloc.rptr,
-						event.as.malloc.size, color, offx, offy);
+						event.as.malloc.size, &state->offset, i,
+						color, offx, offy);
 				break;
 
 			case CALLOC:
 				color = GetRandomColor(event.as.calloc.rptr.raw);
 				render_allocation(event_bbox, event.as.calloc.rptr,
 						event.as.calloc.size * event.as.calloc.memb,
-						color, offx, offy);
+						&state->offset, i, color, offx, offy);
 				break;
 
 			case REALLOC:
 				color = GetRandomColor(event.as.realloc.rptr.raw);
 				if(event.as.realloc.fptr.raw != 0) {
 					n32 size = getSizeOfEvent(state->events, i, event.as.realloc.fptr);
-					render_allocation(event_bbox, event.as.realloc.fptr,
-									  size, palette.bcolor, offx, offy);
+					render_allocation(event_bbox, event.as.realloc.fptr, size,
+						&state->offset, i, palette.bcolor, offx, offy);
 				}
 				render_allocation(event_bbox, event.as.realloc.rptr,
-						event.as.realloc.size, color, offx, offy);
+						event.as.realloc.size, &state->offset, i,
+						color, offx, offy);
 				break;
 
 			case FREE: {
 				n32 size = getSizeOfEvent(state->events, i, event.as.free.ptr);
-				render_allocation(event_bbox, event.as.free.ptr,
-								  size, palette.bcolor, offx, offy);
+				render_allocation(event_bbox, event.as.free.ptr, size,
+								  &state->offset, i, palette.bcolor, offx, offy);
 				break;
 			}
 		}

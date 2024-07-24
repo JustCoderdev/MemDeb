@@ -46,12 +46,13 @@ void parsedump(char* filepath, MEvents* events) {
 	String buffer = {0};
 	MEvent event = {0};
 	enum { PR_FILE, PR_TYPE, PR_INPUT, PR_OUTPUT } state = PR_FILE;
+	n64 i;
 	char c;
 
 	FILE* file = fopen(filepath, "r");
 	assert(file);
 
-	while((c = getc(file)) != EOF) {
+	for(i = 0; (c = getc(file)) != EOF; ++i) {
 		switch(c) {
 			case '\n': {
 				n32 data;
@@ -119,8 +120,8 @@ void parsedump(char* filepath, MEvents* events) {
 						} else if(string_equals(buffer, "FREE", strlen("FREE"))) {
 							event.type = FREE;
 						} else {
-							printf(STR_FMT"\n", STR(buffer));
-							assert(0);
+							printf("Unrecognised pattern in pos %lu: "STR_FMT"\n", i, STR(buffer));
+							exit(failure);
 						}
 
 						string_clear(&buffer);
@@ -151,7 +152,9 @@ void parsedump(char* filepath, MEvents* events) {
 						break;
 					}
 
-					default: assert(0);
+					default:
+						printf("ERROR: Unexpected space (' ') in pos %lu\n", i);
+						exit(failure);
 				}
 				break;
 
@@ -206,13 +209,31 @@ void printdump(MEvents events) {
 	}
 }
 
-int main(void) {
+char* shift(char*** argv, int* argc) {
+	char* t;
+	assert(*argc > 0);
+
+	(*argc)--;
+	t = (*argv)[*argc];
+	(*argv)++;
+
+	return t;
+}
+
+int main(int argc, char** argv) {
 	HGL_State state = {0};
 	n64 tick = 0;
 
-	parsedump("memdump", &state.events);
-	/* printdump(state.events); */
-	/* return 1; */
+	char* program = shift(&argv, &argc);
+	char* dumppath;
+
+	if(argc < 1) {
+		printf("Incorrect usage: %s <filepath>\n", program);
+		exit(failure);
+	}
+
+	dumppath = shift(&argv, &argc);
+	parsedump(dumppath, &state.events);
 
 	if(HGL_load(DL_PATH)) exit(failure);
 
