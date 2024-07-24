@@ -1,203 +1,323 @@
-WeatherReacher.c:429	REALLOC 0 400	0x17d0490
-lib/core/core_str.c:16	MALLOC 32	0x17d0630
-lib/core/core_str.c:33	MALLOC 8	0x17d1670
-lib/core/core_str.c:33	MALLOC 5	0x17d1690
-lib/core/core_str.c:33	MALLOC 9	0x17d16b0
-jlexer.c:19	REALLOC 0x17d0490 880	0x17d16d0
-lib/core/core_str.c:33	MALLOC 9	0x17d1a50
-lib/core/core_str.c:33	MALLOC 17	0x17d1a70
-lib/core/core_str.c:33	MALLOC 20	0x17d1a90
-lib/core/core_str.c:33	MALLOC 18	0x17d1ab0
-jlexer.c:19	REALLOC 0x17d16d0 1840	0x17d1ad0
-lib/core/core_str.c:33	MALLOC 1	0x17d2210
-lib/core/core_str.c:33	MALLOC 8	0x17d2230
-lib/core/core_str.c:33	MALLOC 3	0x17d2250
-lib/core/core_str.c:33	MALLOC 21	0x17d2270
-lib/core/core_str.c:33	MALLOC 3	0x17d2290
-lib/core/core_str.c:33	MALLOC 9	0x17d22b0
-lib/core/core_str.c:33	MALLOC 2	0x17d22d0
-jlexer.c:19	REALLOC 0x17d1ad0 3760	0x17d22f0
-lib/core/core_str.c:33	MALLOC 12	0x17d1ad0
-lib/core/core_str.c:33	MALLOC 4	0x17d1af0
-lib/core/core_str.c:33	MALLOC 7	0x17d1b10
-lib/core/core_str.c:33	MALLOC 14	0x17d1b30
-lib/core/core_str.c:33	MALLOC 3	0x17d1b50
-lib/core/core_str.c:33	MALLOC 25	0x17d1b70
-lib/core/core_str.c:33	MALLOC 1	0x17d1ba0
-lib/core/core_str.c:33	MALLOC 6	0x17d1bc0
-lib/core/core_str.c:33	MALLOC 4	0x17d1be0
-lib/core/core_str.c:33	MALLOC 16	0x17d1c00
-lib/core/core_str.c:33	MALLOC 16	0x17d1c20
-jlexer.c:19	REALLOC 0x17d22f0 7600	0x17d22f0
-lib/core/core_str.c:33	MALLOC 16	0x17d1c40
-lib/core/core_str.c:33	MALLOC 16	0x17d1c60
-lib/core/core_str.c:33	MALLOC 16	0x17d1c80
-lib/core/core_str.c:33	MALLOC 16	0x17d1ca0
-lib/core/core_str.c:33	MALLOC 16	0x17d1cc0
-lib/core/core_str.c:33	MALLOC 16	0x17d1ce0
-lib/core/core_str.c:33	MALLOC 16	0x17d1d00
-lib/core/core_str.c:33	MALLOC 16	0x17d1d20
-lib/core/core_str.c:33	MALLOC 16	0x17d1d40
-lib/core/core_str.c:33	MALLOC 16	0x17d1d60
-lib/core/core_str.c:33	MALLOC 16	0x17d1d80
-lib/core/core_str.c:33	MALLOC 16	0x17d1da0
-lib/core/core_str.c:33	MALLOC 16	0x17d1dc0
-lib/core/core_str.c:33	MALLOC 16	0x17d1de0
-lib/core/core_str.c:33	MALLOC 16	0x17d1e00
-lib/core/core_str.c:33	MALLOC 16	0x17d1e20
-lib/core/core_str.c:33	MALLOC 16	0x17d1e40
-lib/core/core_str.c:33	MALLOC 16	0x17d1e60
-lib/core/core_str.c:33	MALLOC 16	0x17d1e80
-lib/core/core_str.c:33	MALLOC 16	0x17d1ea0
-lib/core/core_str.c:33	MALLOC 16	0x17d1ec0
-lib/core/core_str.c:33	MALLOC 16	0x17d1ee0
-lib/core/core_str.c:33	MALLOC 14	0x17d1f00
-lib/core/core_str.c:33	MALLOC 4	0x17d1f20
-jlexer.c:19	REALLOC 0x17d22f0 15280	0x17d22f0
-lib/core/core_str.c:33	MALLOC 4	0x17d1f40
-lib/core/core_str.c:33	MALLOC 4	0x17d1f60
-lib/core/core_str.c:33	MALLOC 4	0x17d1f80
-lib/core/core_str.c:33	MALLOC 4	0x17d1fa0
-lib/core/core_str.c:33	MALLOC 2	0x17d1fc0
-lib/core/core_str.c:33	MALLOC 4	0x17d1fe0
-lib/core/core_str.c:33	MALLOC 4	0x17d2000
-lib/core/core_str.c:33	MALLOC 4	0x17d2020
-lib/core/core_str.c:33	MALLOC 4	0x17d2040
-lib/core/core_str.c:33	MALLOC 4	0x17d2060
-lib/core/core_str.c:33	MALLOC 4	0x17d2080
-lib/core/core_str.c:33	MALLOC 4	0x17d20a0
-lib/core/core_str.c:33	MALLOC 4	0x17d20c0
-lib/core/core_str.c:33	MALLOC 4	0x17d20e0
-lib/core/core_str.c:33	MALLOC 4	0x17d2100
-lib/core/core_str.c:33	MALLOC 4	0x17d2120
-lib/core/core_str.c:33	MALLOC 4	0x17d2140
-lib/core/core_str.c:33	MALLOC 4	0x17d2160
-lib/core/core_str.c:33	MALLOC 4	0x17d2180
-lib/core/core_str.c:33	MALLOC 4	0x17d21a0
-lib/core/core_str.c:33	MALLOC 4	0x17d21c0
-lib/core/core_str.c:33	MALLOC 4	0x17d21e0
-lib/core/core_str.c:33	MALLOC 4	0x17d5eb0
-lib/core/core_str.c:33	MALLOC 25	0x17d5ed0
-lib/core/core_str.c:33	MALLOC 1	0x17d5f00
-lib/core/core_str.c:33	MALLOC 1	0x17d5f20
-lib/core/core_str.c:33	MALLOC 2	0x17d5f40
-lib/core/core_str.c:33	MALLOC 2	0x17d5f60
-lib/core/core_str.c:33	MALLOC 1	0x17d5f80
-lib/core/core_str.c:33	MALLOC 1	0x17d5fa0
-lib/core/core_str.c:33	MALLOC 1	0x17d5fc0
-lib/core/core_str.c:33	MALLOC 1	0x17d5fe0
-lib/core/core_str.c:33	MALLOC 1	0x17d6000
-lib/core/core_str.c:33	MALLOC 1	0x17d6020
-lib/core/core_str.c:33	MALLOC 1	0x17d6040
-lib/core/core_str.c:33	MALLOC 1	0x17d6060
-lib/core/core_str.c:33	MALLOC 1	0x17d6080
-lib/core/core_str.c:33	MALLOC 1	0x17d60a0
-lib/core/core_str.c:33	MALLOC 1	0x17d60c0
-lib/core/core_str.c:33	MALLOC 1	0x17d60e0
-lib/core/core_str.c:33	MALLOC 1	0x17d6100
-lib/core/core_str.c:33	MALLOC 2	0x17d6120
-lib/core/core_str.c:33	MALLOC 2	0x17d6140
-lib/core/core_str.c:33	MALLOC 2	0x17d6160
-lib/core/core_str.c:33	MALLOC 1	0x17d6180
-lib/core/core_str.c:33	MALLOC 1	0x17d61a0
-lib/core/core_str.c:33	MALLOC 1	0x17d61c0
-lib/core/core_str.c:33	MALLOC 1	0x17d61e0
-lib/core/core_str.c:109	FREE 0x17d0630
-lib/core/core_str.c:109	FREE 0x17d1670
-lib/core/core_str.c:109	FREE 0x17d1690
-lib/core/core_str.c:109	FREE 0x17d16b0
-lib/core/core_str.c:109	FREE 0x17d1a50
-lib/core/core_str.c:109	FREE 0x17d1a70
-lib/core/core_str.c:109	FREE 0x17d1a90
-lib/core/core_str.c:109	FREE 0x17d1ab0
-lib/core/core_str.c:109	FREE 0x17d2210
-lib/core/core_str.c:109	FREE 0x17d2230
-lib/core/core_str.c:109	FREE 0x17d2250
-lib/core/core_str.c:109	FREE 0x17d2270
-lib/core/core_str.c:109	FREE 0x17d2290
-lib/core/core_str.c:109	FREE 0x17d22b0
-lib/core/core_str.c:109	FREE 0x17d22d0
-lib/core/core_str.c:109	FREE 0x17d1ad0
-lib/core/core_str.c:109	FREE 0x17d1af0
-lib/core/core_str.c:109	FREE 0x17d1b10
-lib/core/core_str.c:109	FREE 0x17d1b30
-lib/core/core_str.c:109	FREE 0x17d1b50
-lib/core/core_str.c:109	FREE 0x17d1b70
-lib/core/core_str.c:109	FREE 0x17d1ba0
-lib/core/core_str.c:109	FREE 0x17d1bc0
-lib/core/core_str.c:109	FREE 0x17d1be0
-lib/core/core_str.c:109	FREE 0x17d1c00
-lib/core/core_str.c:109	FREE 0x17d1c20
-lib/core/core_str.c:109	FREE 0x17d1c40
-lib/core/core_str.c:109	FREE 0x17d1c60
-lib/core/core_str.c:109	FREE 0x17d1c80
-lib/core/core_str.c:109	FREE 0x17d1ca0
-lib/core/core_str.c:109	FREE 0x17d1cc0
-lib/core/core_str.c:109	FREE 0x17d1ce0
-lib/core/core_str.c:109	FREE 0x17d1d00
-lib/core/core_str.c:109	FREE 0x17d1d20
-lib/core/core_str.c:109	FREE 0x17d1d40
-lib/core/core_str.c:109	FREE 0x17d1d60
-lib/core/core_str.c:109	FREE 0x17d1d80
-lib/core/core_str.c:109	FREE 0x17d1da0
-lib/core/core_str.c:109	FREE 0x17d1dc0
-lib/core/core_str.c:109	FREE 0x17d1de0
-lib/core/core_str.c:109	FREE 0x17d1e00
-lib/core/core_str.c:109	FREE 0x17d1e20
-lib/core/core_str.c:109	FREE 0x17d1e40
-lib/core/core_str.c:109	FREE 0x17d1e60
-lib/core/core_str.c:109	FREE 0x17d1e80
-lib/core/core_str.c:109	FREE 0x17d1ea0
-lib/core/core_str.c:109	FREE 0x17d1ec0
-lib/core/core_str.c:109	FREE 0x17d1ee0
-lib/core/core_str.c:109	FREE 0x17d1f00
-lib/core/core_str.c:109	FREE 0x17d1f20
-lib/core/core_str.c:109	FREE 0x17d1f40
-lib/core/core_str.c:109	FREE 0x17d1f60
-lib/core/core_str.c:109	FREE 0x17d1f80
-lib/core/core_str.c:109	FREE 0x17d1fa0
-lib/core/core_str.c:109	FREE 0x17d1fc0
-lib/core/core_str.c:109	FREE 0x17d1fe0
-lib/core/core_str.c:109	FREE 0x17d2000
-lib/core/core_str.c:109	FREE 0x17d2020
-lib/core/core_str.c:109	FREE 0x17d2040
-lib/core/core_str.c:109	FREE 0x17d2060
-lib/core/core_str.c:109	FREE 0x17d2080
-lib/core/core_str.c:109	FREE 0x17d20a0
-lib/core/core_str.c:109	FREE 0x17d20c0
-lib/core/core_str.c:109	FREE 0x17d20e0
-lib/core/core_str.c:109	FREE 0x17d2100
-lib/core/core_str.c:109	FREE 0x17d2120
-lib/core/core_str.c:109	FREE 0x17d2140
-lib/core/core_str.c:109	FREE 0x17d2160
-lib/core/core_str.c:109	FREE 0x17d2180
-lib/core/core_str.c:109	FREE 0x17d21a0
-lib/core/core_str.c:109	FREE 0x17d21c0
-lib/core/core_str.c:109	FREE 0x17d21e0
-lib/core/core_str.c:109	FREE 0x17d5eb0
-lib/core/core_str.c:109	FREE 0x17d5ed0
-lib/core/core_str.c:109	FREE 0x17d5f00
-lib/core/core_str.c:109	FREE 0x17d5f20
-lib/core/core_str.c:109	FREE 0x17d5f40
-lib/core/core_str.c:109	FREE 0x17d5f60
-lib/core/core_str.c:109	FREE 0x17d5f80
-lib/core/core_str.c:109	FREE 0x17d5fa0
-lib/core/core_str.c:109	FREE 0x17d5fc0
-lib/core/core_str.c:109	FREE 0x17d5fe0
-lib/core/core_str.c:109	FREE 0x17d6000
-lib/core/core_str.c:109	FREE 0x17d6020
-lib/core/core_str.c:109	FREE 0x17d6040
-lib/core/core_str.c:109	FREE 0x17d6060
-lib/core/core_str.c:109	FREE 0x17d6080
-lib/core/core_str.c:109	FREE 0x17d60a0
-lib/core/core_str.c:109	FREE 0x17d60c0
-lib/core/core_str.c:109	FREE 0x17d60e0
-lib/core/core_str.c:109	FREE 0x17d6100
-lib/core/core_str.c:109	FREE 0x17d6120
-lib/core/core_str.c:109	FREE 0x17d6140
-lib/core/core_str.c:109	FREE 0x17d6160
-lib/core/core_str.c:109	FREE 0x17d6180
-lib/core/core_str.c:109	FREE 0x17d61a0
-lib/core/core_str.c:109	FREE 0x17d61c0
-lib/core/core_str.c:109	FREE 0x17d61e0
-WeatherReacher.c:461	FREE 0x17d22f0
+WeatherReacher.c:428	REALLOC 0 400	0x612890
+WeatherReacher.c:429	MALLOC 32	0x612a30
+jlexer.c:28	MALLOC 8	0x613a70
+jlexer.c:28	MALLOC 5	0x613a90
+jlexer.c:28	MALLOC 9	0x613ab0
+jlexer.c:19	REALLOC 0x612890 880	0x613ad0
+jlexer.c:28	MALLOC 9	0x613e50
+jlexer.c:28	MALLOC 17	0x613e70
+jlexer.c:28	MALLOC 20	0x613e90
+jlexer.c:28	MALLOC 18	0x613eb0
+jlexer.c:19	REALLOC 0x613ad0 1840	0x613ed0
+jlexer.c:28	MALLOC 1	0x614610
+jlexer.c:28	MALLOC 8	0x614630
+jlexer.c:28	MALLOC 3	0x614650
+jlexer.c:28	MALLOC 21	0x614670
+jlexer.c:28	MALLOC 3	0x614690
+jlexer.c:28	MALLOC 9	0x6146b0
+jlexer.c:28	MALLOC 2	0x6146d0
+jlexer.c:19	REALLOC 0x613ed0 3760	0x6146f0
+jlexer.c:28	MALLOC 12	0x613ed0
+jlexer.c:28	MALLOC 4	0x613ef0
+jlexer.c:28	MALLOC 7	0x613f10
+jlexer.c:28	MALLOC 14	0x613f30
+jlexer.c:28	MALLOC 3	0x613f50
+jlexer.c:28	MALLOC 25	0x613f70
+jlexer.c:28	MALLOC 1	0x613fa0
+jlexer.c:28	MALLOC 6	0x613fc0
+jlexer.c:28	MALLOC 4	0x613fe0
+jlexer.c:28	MALLOC 16	0x614000
+jlexer.c:28	MALLOC 16	0x614020
+jlexer.c:19	REALLOC 0x6146f0 7600	0x6146f0
+jlexer.c:28	MALLOC 16	0x614040
+jlexer.c:28	MALLOC 16	0x614060
+jlexer.c:28	MALLOC 16	0x614080
+jlexer.c:28	MALLOC 16	0x6140a0
+jlexer.c:28	MALLOC 16	0x6140c0
+jlexer.c:28	MALLOC 16	0x6140e0
+jlexer.c:28	MALLOC 16	0x614100
+jlexer.c:28	MALLOC 16	0x614120
+jlexer.c:28	MALLOC 16	0x614140
+jlexer.c:28	MALLOC 16	0x614160
+jlexer.c:28	MALLOC 16	0x614180
+jlexer.c:28	MALLOC 16	0x6141a0
+jlexer.c:28	MALLOC 16	0x6141c0
+jlexer.c:28	MALLOC 16	0x6141e0
+jlexer.c:28	MALLOC 16	0x614200
+jlexer.c:28	MALLOC 16	0x614220
+jlexer.c:28	MALLOC 16	0x614240
+jlexer.c:28	MALLOC 16	0x614260
+jlexer.c:28	MALLOC 16	0x614280
+jlexer.c:28	MALLOC 16	0x6142a0
+jlexer.c:28	MALLOC 16	0x6142c0
+jlexer.c:28	MALLOC 16	0x6142e0
+jlexer.c:28	MALLOC 14	0x614300
+jlexer.c:28	MALLOC 4	0x614320
+jlexer.c:19	REALLOC 0x6146f0 15280	0x6146f0
+jlexer.c:28	MALLOC 4	0x614340
+jlexer.c:28	MALLOC 4	0x614360
+jlexer.c:28	MALLOC 4	0x614380
+jlexer.c:28	MALLOC 4	0x6143a0
+jlexer.c:28	MALLOC 2	0x6143c0
+jlexer.c:28	MALLOC 4	0x6143e0
+jlexer.c:28	MALLOC 4	0x614400
+jlexer.c:28	MALLOC 4	0x614420
+jlexer.c:28	MALLOC 4	0x614440
+jlexer.c:28	MALLOC 4	0x614460
+jlexer.c:28	MALLOC 4	0x614480
+jlexer.c:28	MALLOC 4	0x6144a0
+jlexer.c:28	MALLOC 4	0x6144c0
+jlexer.c:28	MALLOC 4	0x6144e0
+jlexer.c:28	MALLOC 4	0x614500
+jlexer.c:28	MALLOC 4	0x614520
+jlexer.c:28	MALLOC 4	0x614540
+jlexer.c:28	MALLOC 4	0x614560
+jlexer.c:28	MALLOC 4	0x614580
+jlexer.c:28	MALLOC 4	0x6145a0
+jlexer.c:28	MALLOC 4	0x6145c0
+jlexer.c:28	MALLOC 4	0x6145e0
+jlexer.c:28	MALLOC 4	0x6182b0
+jlexer.c:28	MALLOC 25	0x6182d0
+jlexer.c:28	MALLOC 1	0x618300
+jlexer.c:28	MALLOC 1	0x618320
+jlexer.c:28	MALLOC 2	0x618340
+jlexer.c:28	MALLOC 2	0x618360
+jlexer.c:28	MALLOC 1	0x618380
+jlexer.c:28	MALLOC 1	0x6183a0
+jlexer.c:28	MALLOC 1	0x6183c0
+jlexer.c:28	MALLOC 1	0x6183e0
+jlexer.c:28	MALLOC 1	0x618400
+jlexer.c:28	MALLOC 1	0x618420
+jlexer.c:28	MALLOC 1	0x618440
+jlexer.c:28	MALLOC 1	0x618460
+jlexer.c:28	MALLOC 1	0x618480
+jlexer.c:28	MALLOC 1	0x6184a0
+jlexer.c:28	MALLOC 1	0x6184c0
+jlexer.c:28	MALLOC 1	0x6184e0
+jlexer.c:28	MALLOC 1	0x618500
+jlexer.c:28	MALLOC 2	0x618520
+jlexer.c:28	MALLOC 2	0x618540
+jlexer.c:28	MALLOC 2	0x618560
+jlexer.c:28	MALLOC 1	0x618580
+jlexer.c:28	MALLOC 1	0x6185a0
+jlexer.c:28	MALLOC 1	0x6185c0
+jlexer.c:28	MALLOC 1	0x6185e0
+WeatherReacher.c:437	FREE 0x612a30
+WeatherReacher.c:259	MALLOC 8	0x612a60
+WeatherReacher.c:170	REALLOC 0x613a90 12	0x613a90
+WeatherReacher.c:280	REALLOC 0 112	0x612a80
+WeatherReacher.c:259	MALLOC 9	0x612b00
+WeatherReacher.c:170	REALLOC 0x613e50 20	0x613e50
+WeatherReacher.c:259	MALLOC 17	0x612b20
+WeatherReacher.c:170	REALLOC 0x613e90 42	0x612b40
+WeatherReacher.c:280	REALLOC 0x612a80 336	0x612b80
+WeatherReacher.c:259	MALLOC 18	0x613e90
+WeatherReacher.c:170	REALLOC 0x614610 4	0x614610
+WeatherReacher.c:259	MALLOC 8	0x612ce0
+WeatherReacher.c:142	MALLOC 3	0x612d00
+WeatherReacher.c:259	MALLOC 21	0x612d20
+WeatherReacher.c:142	MALLOC 3	0x612d40
+WeatherReacher.c:259	MALLOC 9	0x612d60
+WeatherReacher.c:170	REALLOC 0x6146d0 6	0x6146d0
+WeatherReacher.c:280	REALLOC 0x612b80 784	0x612d80
+WeatherReacher.c:259	MALLOC 12	0x6130a0
+WeatherReacher.c:259	MALLOC 4	0x6130c0
+WeatherReacher.c:142	MALLOC 7	0x6130e0
+WeatherReacher.c:280	REALLOC 0 112	0x612a80
+WeatherReacher.c:259	MALLOC 14	0x613100
+WeatherReacher.c:142	MALLOC 3	0x613120
+WeatherReacher.c:259	MALLOC 25	0x612a30
+WeatherReacher.c:142	MALLOC 1	0x613140
+WeatherReacher.c:280	REALLOC 0x612a80 336	0x613160
+WeatherReacher.c:259	MALLOC 6	0x6132c0
+WeatherReacher.c:259	MALLOC 4	0x6132e0
+WeatherReacher.c:142	MALLOC 16	0x613300
+WeatherReacher.c:207	REALLOC 0 64	0x613320
+WeatherReacher.c:142	MALLOC 16	0x613370
+WeatherReacher.c:142	MALLOC 16	0x613390
+WeatherReacher.c:207	REALLOC 0x613320 192	0x6133b0
+WeatherReacher.c:142	MALLOC 16	0x613480
+WeatherReacher.c:142	MALLOC 16	0x6134a0
+WeatherReacher.c:142	MALLOC 16	0x6134c0
+WeatherReacher.c:142	MALLOC 16	0x6134e0
+WeatherReacher.c:207	REALLOC 0x6133b0 448	0x613500
+WeatherReacher.c:142	MALLOC 16	0x6136d0
+WeatherReacher.c:142	MALLOC 16	0x6136f0
+WeatherReacher.c:142	MALLOC 16	0x613710
+WeatherReacher.c:142	MALLOC 16	0x613730
+WeatherReacher.c:142	MALLOC 16	0x613750
+WeatherReacher.c:142	MALLOC 16	0x613770
+WeatherReacher.c:142	MALLOC 16	0x613790
+WeatherReacher.c:142	MALLOC 16	0x6137b0
+WeatherReacher.c:207	REALLOC 0x613500 960	0x618600
+WeatherReacher.c:142	MALLOC 16	0x6137d0
+WeatherReacher.c:142	MALLOC 16	0x6137f0
+WeatherReacher.c:142	MALLOC 16	0x613810
+WeatherReacher.c:142	MALLOC 16	0x613830
+WeatherReacher.c:142	MALLOC 16	0x613850
+WeatherReacher.c:142	MALLOC 16	0x613870
+WeatherReacher.c:142	MALLOC 16	0x613890
+WeatherReacher.c:142	MALLOC 16	0x6138b0
+WeatherReacher.c:142	MALLOC 16	0x6138d0
+WeatherReacher.c:280	REALLOC 0 112	0x612a80
+WeatherReacher.c:259	MALLOC 14	0x6138f0
+WeatherReacher.c:170	REALLOC 0x614320 10	0x614320
+WeatherReacher.c:207	REALLOC 0 64	0x613320
+WeatherReacher.c:170	REALLOC 0x614340 10	0x614340
+WeatherReacher.c:170	REALLOC 0x614360 10	0x614360
+WeatherReacher.c:207	REALLOC 0x613320 192	0x613910
+WeatherReacher.c:170	REALLOC 0x614380 10	0x614380
+WeatherReacher.c:170	REALLOC 0x6143a0 10	0x6143a0
+WeatherReacher.c:170	REALLOC 0x6143c0 6	0x6143c0
+WeatherReacher.c:170	REALLOC 0x6143e0 10	0x6143e0
+WeatherReacher.c:207	REALLOC 0x613910 448	0x6189d0
+WeatherReacher.c:170	REALLOC 0x614400 10	0x614400
+WeatherReacher.c:170	REALLOC 0x614420 10	0x614420
+WeatherReacher.c:170	REALLOC 0x614440 10	0x614440
+WeatherReacher.c:170	REALLOC 0x614460 10	0x614460
+WeatherReacher.c:170	REALLOC 0x614480 10	0x614480
+WeatherReacher.c:170	REALLOC 0x6144a0 10	0x6144a0
+WeatherReacher.c:170	REALLOC 0x6144c0 10	0x6144c0
+WeatherReacher.c:170	REALLOC 0x6144e0 10	0x6144e0
+WeatherReacher.c:207	REALLOC 0x6189d0 960	0x6189d0
+WeatherReacher.c:170	REALLOC 0x614500 10	0x614500
+WeatherReacher.c:170	REALLOC 0x614520 10	0x614520
+WeatherReacher.c:170	REALLOC 0x614540 10	0x614540
+WeatherReacher.c:170	REALLOC 0x614560 10	0x614560
+WeatherReacher.c:170	REALLOC 0x614580 10	0x614580
+WeatherReacher.c:170	REALLOC 0x6145a0 10	0x6145a0
+WeatherReacher.c:170	REALLOC 0x6145c0 10	0x6145c0
+WeatherReacher.c:170	REALLOC 0x6145e0 10	0x6145e0
+WeatherReacher.c:170	REALLOC 0x6182b0 10	0x6182b0
+WeatherReacher.c:259	MALLOC 25	0x6139e0
+WeatherReacher.c:170	REALLOC 0x618300 4	0x618300
+WeatherReacher.c:207	REALLOC 0 64	0x613320
+WeatherReacher.c:170	REALLOC 0x618320 4	0x618320
+WeatherReacher.c:170	REALLOC 0x618340 6	0x618340
+WeatherReacher.c:207	REALLOC 0x613320 192	0x618da0
+WeatherReacher.c:170	REALLOC 0x618360 6	0x618360
+WeatherReacher.c:170	REALLOC 0x618380 4	0x618380
+WeatherReacher.c:170	REALLOC 0x6183a0 4	0x6183a0
+WeatherReacher.c:170	REALLOC 0x6183c0 4	0x6183c0
+WeatherReacher.c:207	REALLOC 0x618da0 448	0x618da0
+WeatherReacher.c:170	REALLOC 0x6183e0 4	0x6183e0
+WeatherReacher.c:170	REALLOC 0x618400 4	0x618400
+WeatherReacher.c:170	REALLOC 0x618420 4	0x618420
+WeatherReacher.c:170	REALLOC 0x618440 4	0x618440
+WeatherReacher.c:170	REALLOC 0x618460 4	0x618460
+WeatherReacher.c:170	REALLOC 0x618480 4	0x618480
+WeatherReacher.c:170	REALLOC 0x6184a0 4	0x6184a0
+WeatherReacher.c:170	REALLOC 0x6184c0 4	0x6184c0
+WeatherReacher.c:207	REALLOC 0x618da0 960	0x618da0
+WeatherReacher.c:170	REALLOC 0x6184e0 4	0x6184e0
+WeatherReacher.c:170	REALLOC 0x618500 4	0x618500
+WeatherReacher.c:170	REALLOC 0x618520 6	0x618520
+WeatherReacher.c:170	REALLOC 0x618540 6	0x618540
+WeatherReacher.c:170	REALLOC 0x618560 6	0x618560
+WeatherReacher.c:170	REALLOC 0x618580 4	0x618580
+WeatherReacher.c:170	REALLOC 0x6185a0 4	0x6185a0
+WeatherReacher.c:170	REALLOC 0x6185c0 4	0x6185c0
+WeatherReacher.c:170	REALLOC 0x6185e0 4	0x6185e0
+WeatherReacher.c:280	REALLOC 0x612a80 336	0x619170
+WeatherReacher.c:462	FREE 0x613a70
+WeatherReacher.c:462	FREE 0x613a90
+WeatherReacher.c:462	FREE 0x613ab0
+WeatherReacher.c:462	FREE 0x613e50
+WeatherReacher.c:462	FREE 0x613e70
+WeatherReacher.c:462	FREE 0x613e90
+WeatherReacher.c:462	FREE 0x613eb0
+WeatherReacher.c:462	FREE 0x614610
+WeatherReacher.c:462	FREE 0x614630
+WeatherReacher.c:462	FREE 0x614650
+WeatherReacher.c:462	FREE 0x614670
+WeatherReacher.c:462	FREE 0x614690
+WeatherReacher.c:462	FREE 0x6146b0
+WeatherReacher.c:462	FREE 0x6146d0
+WeatherReacher.c:462	FREE 0x613ed0
+WeatherReacher.c:462	FREE 0x613ef0
+WeatherReacher.c:462	FREE 0x613f10
+WeatherReacher.c:462	FREE 0x613f30
+WeatherReacher.c:462	FREE 0x613f50
+WeatherReacher.c:462	FREE 0x613f70
+WeatherReacher.c:462	FREE 0x613fa0
+WeatherReacher.c:462	FREE 0x613fc0
+WeatherReacher.c:462	FREE 0x613fe0
+WeatherReacher.c:462	FREE 0x614000
+WeatherReacher.c:462	FREE 0x614020
+WeatherReacher.c:462	FREE 0x614040
+WeatherReacher.c:462	FREE 0x614060
+WeatherReacher.c:462	FREE 0x614080
+WeatherReacher.c:462	FREE 0x6140a0
+WeatherReacher.c:462	FREE 0x6140c0
+WeatherReacher.c:462	FREE 0x6140e0
+WeatherReacher.c:462	FREE 0x614100
+WeatherReacher.c:462	FREE 0x614120
+WeatherReacher.c:462	FREE 0x614140
+WeatherReacher.c:462	FREE 0x614160
+WeatherReacher.c:462	FREE 0x614180
+WeatherReacher.c:462	FREE 0x6141a0
+WeatherReacher.c:462	FREE 0x6141c0
+WeatherReacher.c:462	FREE 0x6141e0
+WeatherReacher.c:462	FREE 0x614200
+WeatherReacher.c:462	FREE 0x614220
+WeatherReacher.c:462	FREE 0x614240
+WeatherReacher.c:462	FREE 0x614260
+WeatherReacher.c:462	FREE 0x614280
+WeatherReacher.c:462	FREE 0x6142a0
+WeatherReacher.c:462	FREE 0x6142c0
+WeatherReacher.c:462	FREE 0x6142e0
+WeatherReacher.c:462	FREE 0x614300
+WeatherReacher.c:462	FREE 0x614320
+WeatherReacher.c:462	FREE 0x614340
+WeatherReacher.c:462	FREE 0x614360
+WeatherReacher.c:462	FREE 0x614380
+WeatherReacher.c:462	FREE 0x6143a0
+WeatherReacher.c:462	FREE 0x6143c0
+WeatherReacher.c:462	FREE 0x6143e0
+WeatherReacher.c:462	FREE 0x614400
+WeatherReacher.c:462	FREE 0x614420
+WeatherReacher.c:462	FREE 0x614440
+WeatherReacher.c:462	FREE 0x614460
+WeatherReacher.c:462	FREE 0x614480
+WeatherReacher.c:462	FREE 0x6144a0
+WeatherReacher.c:462	FREE 0x6144c0
+WeatherReacher.c:462	FREE 0x6144e0
+WeatherReacher.c:462	FREE 0x614500
+WeatherReacher.c:462	FREE 0x614520
+WeatherReacher.c:462	FREE 0x614540
+WeatherReacher.c:462	FREE 0x614560
+WeatherReacher.c:462	FREE 0x614580
+WeatherReacher.c:462	FREE 0x6145a0
+WeatherReacher.c:462	FREE 0x6145c0
+WeatherReacher.c:462	FREE 0x6145e0
+WeatherReacher.c:462	FREE 0x6182b0
+WeatherReacher.c:462	FREE 0x6182d0
+WeatherReacher.c:462	FREE 0x618300
+WeatherReacher.c:462	FREE 0x618320
+WeatherReacher.c:462	FREE 0x618340
+WeatherReacher.c:462	FREE 0x618360
+WeatherReacher.c:462	FREE 0x618380
+WeatherReacher.c:462	FREE 0x6183a0
+WeatherReacher.c:462	FREE 0x6183c0
+WeatherReacher.c:462	FREE 0x6183e0
+WeatherReacher.c:462	FREE 0x618400
+WeatherReacher.c:462	FREE 0x618420
+WeatherReacher.c:462	FREE 0x618440
+WeatherReacher.c:462	FREE 0x618460
+WeatherReacher.c:462	FREE 0x618480
+WeatherReacher.c:462	FREE 0x6184a0
+WeatherReacher.c:462	FREE 0x6184c0
+WeatherReacher.c:462	FREE 0x6184e0
+WeatherReacher.c:462	FREE 0x618500
+WeatherReacher.c:462	FREE 0x618520
+WeatherReacher.c:462	FREE 0x618540
+WeatherReacher.c:462	FREE 0x618560
+WeatherReacher.c:462	FREE 0x618580
+WeatherReacher.c:462	FREE 0x6185a0
+WeatherReacher.c:462	FREE 0x6185c0
+WeatherReacher.c:462	FREE 0x6185e0
+WeatherReacher.c:464	FREE 0x6146f0
+WeatherReacher.c:391	FREE 0x612a60
+WeatherReacher.c:391	FREE 0x612b00
+WeatherReacher.c:391	FREE 0x612b20
+WeatherReacher.c:391	FREE 0x613e90

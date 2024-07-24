@@ -44,9 +44,10 @@ Color htoc(n32 hex) { /* 0x RR GG BB AA */
 Color GetRandomColor(n32 seed) {
 	SetRandomSeed(seed);
 	Color color = {0};
-	color.r = GetRandomValue(0, 255);
-	color.g = GetRandomValue(0, 255);
-	color.b = GetRandomValue(0, 255);
+	float heat = GetRandomValue(0, 99);
+	color.r = GetRandomValue(20 + 5 * (heat / 3    ), 255);
+	color.g = GetRandomValue(20 + 5 * (heat / 3 * 2), 255);
+	color.b = GetRandomValue(20 + 5 * (heat        ), 255);
 	color.a = 255;
 	return color;
 }
@@ -124,9 +125,9 @@ void draw_bar(Rectangle bbox, n64* progress, n64 total, n64 visible_items, Palet
 
 		SetMouseCursor(dragging ? MOUSE_CURSOR_POINTING_HAND : MOUSE_CURSOR_DEFAULT);
 		if(dragging) {
-			float ccenter = cursor.height / 2;
-			float mouseprog = clamp(bbox.y, mouse.y - ccenter, bbox.y + bbox.height - cursor.height);
-			*progress = max(0, mouseprog - ccenter) / seg;
+			float hcursor = cursor.height / 2;
+			float mouseprog = clamp(bbox.y, mouse.y, bbox.y + bbox.height - hcursor);
+			*progress = max(0, mouseprog - hcursor) / seg;
 		}
 	}
 
@@ -297,18 +298,25 @@ void draw_list(Rectangle bbox, HGL_State* state, Palette palette)
 
 	/* Draw Border */
 	{
-		Rectangle bar_bbox = {0};
+		Rectangle box = {0};
+
+		/* Scroll bar */
+		box.x = bbox.x + bbox.width - BAR_WIDTH - PAD;
+		box.y = PAD;
+		box.width = BAR_WIDTH;
+		box.height = bbox.height - DPAD;
+		draw_bar(box, &state->offset, state->events.count,
+				visible_events_count, palette);
+
+		/* Clip content */
+		box.x = bbox.x;
+		box.y = bbox.y;
+		box.width = bbox.width;
+		box.height = bbox.height;
+		DrawRectangleLinesEx(box, PAD, palette.bcolor);
 
 		/* Event queue border */
 		DrawRectangleLinesEx(bbox, BORD, palette.fcolor);
-
-		/* Scroll bar */
-		bar_bbox.x = bbox.x + bbox.width - BAR_WIDTH - PAD;
-		bar_bbox.y = PAD;
-		bar_bbox.width = BAR_WIDTH;
-		bar_bbox.height = bbox.height - DPAD;
-		draw_bar(bar_bbox, &state->offset, state->events.count,
-				visible_events_count, palette);
 	}
 }
 
@@ -517,10 +525,10 @@ void tick_fn(HGL_State* state) {
 	draw_list(bbox, state, palette);
 
 	/* Draw event view */
-	bbox.width = WINDOW_WIDTH - bbox.width - PAD - HPAD;
-	bbox.height = WINDOW_HEIGHT - DPAD - QPAD;
-	bbox.x = PAD;
-	bbox.y = QPAD;
+	bbox.x = 0;
+	bbox.y = FONT_SIZE + PAD + HPAD;
+	bbox.width = WINDOW_WIDTH - bbox.width + BORD;
+	bbox.height = WINDOW_HEIGHT - bbox.y;
 	draw_mainview(bbox, state, palette);
 
 	/* Extern border */
