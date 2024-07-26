@@ -1,17 +1,23 @@
 #include "hotdraw.h"
 #include <core.h>
 
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/inotify.h>
 #include <assert.h>
 #include <stdlib.h>
+#include <errno.h>
+#include <string.h>
+
 #include <stdio.h>
+FILE *fdopen(int fd, const char *mode);
 
 #include <linux/time.h>
 int nanosleep(const struct timespec *req, struct timespec *rem);
 
 #include <raylib.h>
 
-
-#define DL_PATH ("libhotfile.so")
+#define DL_PATH "libhotfile.so"
 
 Color htoc(n32 hex) { /* 0x RR GG BB AA */
 	Color color = {0};
@@ -43,7 +49,7 @@ void show_pending_screen(void) {
 }
 
 void parsedump(char* filepath, MEvents* events) {
-	String buffer = {0};
+	String event_buffer = {0};
 	MEvent event = {0};
 	enum { PR_FILE, PR_TYPE, PR_INPUT, PR_OUTPUT } state = PR_FILE;
 	n64 i;
@@ -57,10 +63,10 @@ void parsedump(char* filepath, MEvents* events) {
 			case '\n': {
 				n32 data;
 
-				string_nterm(&buffer);
+				string_nterm(&event_buffer);
 
 				errno = 0;
-				data = strtol(buffer.chars, NULL, 16);
+				data = strtol(event_buffer.chars, NULL, 16);
  				assert(!errno);
 
 				switch(event.type) {
@@ -71,7 +77,7 @@ void parsedump(char* filepath, MEvents* events) {
 					default: assert(0);
 				}
 				arr_append(events, event);
-				string_clear(&buffer);
+				string_clear(&event_buffer);
 				state = PR_FILE;
 				break;
 			}
@@ -79,16 +85,16 @@ void parsedump(char* filepath, MEvents* events) {
 			case '\t':
 				switch(state) {
 					case PR_FILE:
-						string_new_from(&event.file_line, buffer.chars, buffer.count);
+						string_new_from(&event.file_line, event_buffer.chars, event_buffer.count);
 						state = PR_TYPE;
 						break;
 
 					case PR_INPUT: {
 						n64 data;
-						string_nterm(&buffer);
+						string_nterm(&event_buffer);
 
 						errno = 0;
-						data = strtol(buffer.chars, NULL, 10);
+						data = strtol(event_buffer.chars, NULL, 10);
 						assert(!errno);
 
 						switch(event.type) {
@@ -105,50 +111,50 @@ void parsedump(char* filepath, MEvents* events) {
 					default: assert(0);
 				}
 
-				string_clear(&buffer);
+				string_clear(&event_buffer);
 				break;
 
 			case ' ':
 				switch(state) {
 					case PR_TYPE:
-						if(string_equals(buffer, "MALLOC", strlen("MALLOC"))) {
+						if(string_equals(event_buffer, "MALLOC", strlen("MALLOC"))) {
 							event.type = MALLOC;
-						} else if(string_equals(buffer, "CALLOC", strlen("CALLOC"))) {
+						} else if(string_equals(event_buffer, "CALLOC", strlen("CALLOC"))) {
 							event.type = CALLOC;
-						} else if(string_equals(buffer, "REALLOC", strlen("REALLOC"))) {
+						} else if(string_equals(event_buffer, "REALLOC", strlen("REALLOC"))) {
 							event.type = REALLOC;
-						} else if(string_equals(buffer, "FREE", strlen("FREE"))) {
+						} else if(string_equals(event_buffer, "FREE", strlen("FREE"))) {
 							event.type = FREE;
 						} else {
-							printf("Unrecognised pattern in pos %lu: "STR_FMT"\n", i, STR(buffer));
+							printf("Unrecognised pattern in pos %lu: "STR_FMT"\n", i, STR(event_buffer));
 							exit(failure);
 						}
 
-						string_clear(&buffer);
+						string_clear(&event_buffer);
 						state = PR_INPUT;
 						break;
 
 					case PR_INPUT: {
 						n64 data;
-						string_nterm(&buffer);
+						string_nterm(&event_buffer);
 
 						switch(event.type) {
 							case CALLOC:
 								errno = 0;
-								event.as.calloc.memb = strtol(buffer.chars, NULL, 10);
+								event.as.calloc.memb = strtol(event_buffer.chars, NULL, 10);
 								assert(!errno);
 								break;
 
 							case REALLOC:
 								errno = 0;
-								event.as.realloc.fptr.raw = strtol(buffer.chars, NULL, 16);
+								event.as.realloc.fptr.raw = strtol(event_buffer.chars, NULL, 16);
 								assert(!errno);
 								break;
 
 							default: assert(0);
 						}
 
-						string_clear(&buffer);
+						string_clear(&event_buffer);
 						break;
 					}
 
@@ -159,7 +165,7 @@ void parsedump(char* filepath, MEvents* events) {
 				break;
 
 			default:
-				string_append(&buffer, c);
+				string_append(&event_buffer, c);
 		}
 	}
 }
@@ -220,12 +226,92 @@ char* shift(char*** argv, int* argc) {
 	return t;
 }
 
+int inotify_setup() {
+	int flags, events_fd = inotify_init();
+	if(events_fd == -1) {
+		printf("ERROR:%s:%d: Could not initialise file watcher: %s\n",
+				__FILE__, __LINE__, strerror(errno));
+		exit(failure);
+	}
+
+	/* Set fd to not be blocking */
+	flags = fcntl(events_fd, F_GETFL, 0);
+	fcntl(events_fd, F_SETFL, flags | O_NONBLOCK);
+
+	return events_fd;
+}
+
+int inotify_watch(int events_fd, char* path) {
+/* #define ALL_MASKS (IN_ACCESS|IN_ATTRIB|IN_CLOSE_WRITE|IN_CLOSE_NOWRITE|IN_CREATE|IN_DELETE|IN_DELETE_SELF|IN_MODIFY|IN_MOVE_SELF|IN_MOVED_FROM|IN_MOVED_TO|IN_OPEN) */
+	int watch_d = inotify_add_watch(events_fd, path, IN_ACCESS);
+	if(watch_d < 0) {
+		printf("ERROR:%s:%d: Could not add watch to file '%s': %s\n",
+				__FILE__, __LINE__, path, strerror(errno));
+		exit(failure);
+	}
+
+	return watch_d;
+}
+
+void inotify_unwatch(int events_fd, int watch_d) {
+	if(inotify_rm_watch(events_fd, watch_d) < 0) {
+		printf("ERROR:%s:%d: Could not remove watch: %s\n",
+				__FILE__, __LINE__, strerror(errno));
+		exit(failure);
+	}
+}
+
+bool inotify_pinged(int events_fd) {
+	struct inotify_event event_buffer = {0};
+	ssize_t size_read = 0;
+
+	do {
+		size_read = read(events_fd, &event_buffer, sizeof(struct inotify_event));
+		if(size_read < 0) {
+			if(errno == EAGAIN) {
+				return false;
+			}
+
+			printf("ERROR:%s:%d: Could not read watch file: %s\n",
+					__FILE__, __LINE__, strerror(errno));
+			exit(failure);
+		}
+
+		assert(event_buffer.len == 0);
+
+/* #define printmask(MASK) \ */
+/* 		if(event_buffer.mask & MASK) printf(#MASK "\n") */
+		/* printmask(IN_ACCESS); */
+		/* printmask(IN_ATTRIB); */
+		/* printmask(IN_CLOSE_WRITE); */
+		/* printmask(IN_CLOSE_NOWRITE); */
+		/* printmask(IN_CREATE); */
+		/* printmask(IN_DELETE); */
+		/* printmask(IN_DELETE_SELF); */
+		/* printmask(IN_MODIFY); */
+		/* printmask(IN_MOVE_SELF); */
+		/* printmask(IN_MOVED_FROM); */
+		/* printmask(IN_MOVED_TO); */
+		/* printmask(IN_OPEN); */
+
+		if(event_buffer.mask & IN_ATTRIB) {
+			printf("\033[35mEvent emitted: \033[2mIN_ACCESS\033[0m");
+			return true;
+		}
+
+	} while(size_read > 0);
+
+	return false;
+}
+
+
 int main(int argc, char** argv) {
 	HGL_State state = {0};
 	n64 tick = 0;
 
 	char* program = shift(&argv, &argc);
 	char* dumppath;
+	int events_fd, watch_d;
 
 	if(argc < 1) {
 		printf("Incorrect usage: %s <filepath>\n", program);
@@ -241,14 +327,19 @@ int main(int argc, char** argv) {
 	InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Hello world MF!");
 	SetWindowState(FLAG_WINDOW_RESIZABLE);
 
+	events_fd = inotify_setup();
+	watch_d = inotify_watch(events_fd, DL_PATH);
+
 	HGL_init_fn(&state);
 	while(!WindowShouldClose()) {
-		if(IsKeyPressed(KEY_R)) {
+		if(IsKeyPressed(KEY_R) || inotify_pinged(events_fd)) {
 			show_pending_screen();
+			inotify_unwatch(events_fd, watch_d);
 
 			if(HGL_reload())
 				exit(failure);
 
+			watch_d = inotify_watch(events_fd, DL_PATH);
 			continue;
 		}
 
