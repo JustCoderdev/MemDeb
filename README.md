@@ -5,6 +5,8 @@ that shows on screen a timeline of allocations and freeings and let's you
 jump in between and analize what was deallocated, where, what happened and
 all the usual segfault shenanigans (like double freeing a pointer...)
 
+TODO: add demo gif
+
 ## The log format
 
 > Note: null pointers should be represented by 0 and not (nil)!
